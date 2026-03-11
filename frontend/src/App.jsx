@@ -110,7 +110,7 @@ export default function App() {
             background: 'var(--accent)', display: 'flex', alignItems: 'center',
             justifyContent: 'center', color: '#fff', fontSize: '14px', fontWeight: '700',
           }}>✦</div>
-          <span style={{ fontWeight: '700', fontSize: '16px', color: 'var(--text)', letterSpacing: '-0.3px' }}>TaskFlow</span>
+          <span style={{ fontWeight: '700', fontSize: '16px', color: 'var(--text)', letterSpacing: '-0.3px' }}>FocusBoard</span>
         </div>
 
         <div style={{ flex: 1 }} />

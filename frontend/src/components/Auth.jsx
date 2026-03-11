@@ -43,7 +43,7 @@ export default function Auth({ onLoginSuccess }) {
             <div style={{ position: 'absolute', top: '-100px', right: '-80px', width: '360px', height: '360px', borderRadius: '50%', background: 'rgba(255,255,255,0.05)' }} />
             <div style={{ position: 'absolute', top: '40px', left: '40px', width: '180px', height: '180px', borderRadius: '50%', background: 'rgba(255,255,255,0.03)' }} />
             <div style={{ position: 'relative' }}>
-            <div style={{ fontSize: '16px', fontWeight: '700', color: 'rgba(255,255,255,0.5)', letterSpacing: '1px', marginBottom: '24px' }}>✦ TASKFLOW</div>
+            <div style={{ fontSize: '16px', fontWeight: '700', color: 'rgba(255,255,255,0.5)', letterSpacing: '1px', marginBottom: '24px' }}>✦ FOCUSBOARD</div>
             <h2 style={{ fontFamily: 'Lora, serif', fontSize: '44px', fontWeight: '400', color: '#fff', lineHeight: '1.15', marginBottom: '20px', fontStyle: 'italic' }}>
                 จัดระเบียบ<br />ชีวิตให้ง่าย<br />กว่าเดิม
             </h2>
