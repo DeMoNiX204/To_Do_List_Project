@@ -9,8 +9,8 @@ app.use(express.json());
 app.use(cors());
 
 mongoose.connect(process.env.MONGODB_URI)
-    .then(() => console.log('✅ Connected to MongoDB successfully!'))
-    .catch((err) => console.log('❌ Failed to connect to MongoDB:', err));
+    .then(() => console.log('Connected to MongoDB successfully!'))
+    .catch((err) => console.log('Failed to connect to MongoDB:', err));
 
 // --- เรียกใช้ API Routes ---
 const taskRoutes = require('./routes/tasks');
@@ -21,5 +21,5 @@ app.use('/api/auth', authRoutes); // เพิ่มตรงนี้ เพื
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
-    console.log(`🚀 Server is running on port http://localhost:${PORT}`);
+    console.log(`Server is running on port http://localhost:${PORT}`);
 });
