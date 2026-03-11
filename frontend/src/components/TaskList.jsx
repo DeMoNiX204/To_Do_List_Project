@@ -1,83 +1,98 @@
-function TaskList({ tasks, onDelete }) {
-  // ดักจับกรณีที่ไม่มีงานเลย ให้แสดงข้อความว่างๆ
+export default function TaskList({ tasks, onViewDetails }) {
     if (tasks.length === 0) {
         return (
-        <div style={{ textAlign: 'center', padding: '40px', color: '#888', backgroundColor: '#f8f9fa', borderRadius: '10px' }}>
-            🎉 ไม่มีงานค้างอยู่เลย! พักผ่อนได้เต็มที่ครับ
+        <div style={{
+            textAlign: 'center', padding: '64px 20px',
+            background: 'var(--surface)', border: '1px solid var(--border)',
+            borderRadius: 'var(--r)', boxShadow: 'var(--shadow-sm)',
+        }}>
+            <div style={{ fontSize: '32px', marginBottom: '10px' }}>🌿</div>
+            <p style={{ fontSize: '15px', color: 'var(--text2)', fontWeight: '500' }}>ไม่มีงานที่ตรงกับเงื่อนไข</p>
+            <p style={{ fontSize: '13px', color: 'var(--text3)', marginTop: '4px' }}>ลองเปลี่ยนตัวกรอง หรือเพิ่มงานใหม่ได้เลย</p>
         </div>
         );
     }
 
-    return (
-        <ul style={{ listStyleType: 'none', padding: 0, margin: 0 }}>
-        {/* ใช้ .map() เพื่อวนลูปสร้างรายการงานทีละข้อ */}
-        {tasks.map((task) => (
-            <li 
-            key={task.id} 
-            style={{ 
-                display: 'flex', 
-                justifyContent: 'space-between', 
-                alignItems: 'center', 
-                padding: '20px', 
-                marginBottom: '15px',
-                backgroundColor: '#fff',
-                // เปลี่ยนสีแถบด้านซ้ายตามสถานะของงาน
-                borderLeft: `5px solid ${task.status === 'Done' ? '#28a745' : task.status === 'In Progress' ? '#ffc107' : '#dc3545'}`,
-                borderRadius: '10px',
-                boxShadow: '0 2px 8px rgba(0,0,0,0.05)'
-            }}
-            >
-            <div>
-                {/* ชื่องาน (ถ้าสถานะเป็น Done จะขีดฆ่าข้อความทิ้ง) */}
-                <strong style={{ 
-                fontSize: '18px', 
-                display: 'block', 
-                marginBottom: '10px',
-                textDecoration: task.status === 'Done' ? 'line-through' : 'none',
-                color: task.status === 'Done' ? '#888' : '#333'
-                }}>
-                {task.title}
-                </strong>
-                
-                {/* แถบแสดงข้อมูลเพิ่มเติม (Status, Category, Tags) */}
-                <div style={{ fontSize: '13px', display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
-                <span style={{ backgroundColor: '#f0f0f0', padding: '5px 10px', borderRadius: '15px', color: '#555' }}>
-                    📌 {task.status}
-                </span>
-                <span style={{ backgroundColor: '#e6f7ff', padding: '5px 10px', borderRadius: '15px', color: '#0056b3' }}>
-                    📁 {task.category}
-                </span>
-                {/* ตรวจสอบว่ามี tag ไหม ถ้ามีถึงจะแสดง */}
-                {task.tags && task.tags.length > 0 && (
-                    <span style={{ backgroundColor: '#f8d7da', padding: '5px 10px', borderRadius: '15px', color: '#721c24' }}>
-                    🏷️ {task.tags.join(', ')}
-                    </span>
-                )}
-                </div>
-            </div>
+    const STATUS_MAP = {
+        'To-Do':       { dot: '#d97706', color: '#92400e', bg: '#fef3c7', label: '⏳ รอดำเนินการ' },
+        'In Progress': { dot: '#0284c7', color: '#0c4a6e', bg: '#e0f2fe', label: '🚀 กำลังทำ' },
+        'Done':        { dot: '#16a34a', color: '#14532d', bg: '#dcfce7', label: '✅ เสร็จสิ้น' },
+        'เลยกำหนด':   { dot: '#ef4444', color: '#991b1b', bg: '#fee2e2', label: '⚠️ เลยกำหนด' },
+    };
 
-            {/* ปุ่มลบ */}
-            <button 
-                onClick={() => onDelete(task.id)} 
-                style={{ 
-                padding: '10px 15px', 
-                backgroundColor: '#dc3545', 
-                color: 'white', 
-                border: 'none', 
-                borderRadius: '8px', 
-                cursor: 'pointer',
-                fontWeight: 'bold',
-                transition: 'background-color 0.2s'
-                }}
-                onMouseOver={(e) => e.target.style.backgroundColor = '#c82333'}
-                onMouseOut={(e) => e.target.style.backgroundColor = '#dc3545'}
+    return (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+        {tasks.map(task => {
+            const isOverdue   = task.status === 'เลยกำหนด';
+            const isDone      = task.status === 'Done';
+            const s = STATUS_MAP[task.status] || STATUS_MAP['To-Do'];
+
+            return (
+            <div key={task.id} style={{
+                background: isOverdue ? '#fff8f8' : 'var(--surface)',
+                border: `1px solid ${isOverdue ? '#fca5a5' : 'var(--border)'}`,
+                borderRadius: 'var(--r)', padding: '18px 22px',
+                display: 'flex', alignItems: 'center', gap: '16px',
+                boxShadow: 'var(--shadow-sm)', transition: 'box-shadow 0.15s, transform 0.15s',
+            }}
+                onMouseEnter={e => { e.currentTarget.style.boxShadow = 'var(--shadow-md)'; e.currentTarget.style.transform = 'translateY(-1px)'; }}
+                onMouseLeave={e => { e.currentTarget.style.boxShadow = 'var(--shadow-sm)'; e.currentTarget.style.transform = 'translateY(0)'; }}
             >
-                ลบ
-            </button>
-            </li>
-        ))}
-        </ul>
+                {/* Color stripe */}
+                <div style={{
+                width: '4px', height: '44px', borderRadius: '99px', flexShrink: 0,
+                background: s.dot,
+                }} />
+
+                {/* Text */}
+                <div style={{ flex: 1, minWidth: 0 }}>
+                <div style={{
+                    fontSize: '15px', fontWeight: '600', marginBottom: '8px',
+                    color: isDone ? 'var(--text3)' : isOverdue ? '#dc2626' : 'var(--text)',
+                    textDecoration: isDone ? 'line-through' : 'none',
+                    whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis',
+                }}>{task.title}</div>
+
+                <div style={{ display: 'flex', gap: '7px', flexWrap: 'wrap', alignItems: 'center' }}>
+                    {/* Category */}
+                    <Pill>{catIcon(task.category)} {task.category}</Pill>
+                    {/* Status */}
+                    <Pill color={s.color} bg={s.bg}>{s.label}</Pill>
+                    {/* Due date */}
+                    {task.dueDate && (
+                    <Pill color={isOverdue ? '#991b1b' : 'var(--text3)'} bg={isOverdue ? '#fee2e2' : 'var(--bg2)'}>
+                        📅 {new Date(task.dueDate).toLocaleDateString('th-TH')}
+                    </Pill>
+                    )}
+                </div>
+                </div>
+
+                <button onClick={() => onViewDetails(task)} style={{
+                padding: '8px 18px', background: 'var(--bg)',
+                border: '1px solid var(--border2)', borderRadius: 'var(--r-sm)',
+                color: 'var(--text2)', fontSize: '13px', fontWeight: '500',
+                cursor: 'pointer', flexShrink: 0, transition: 'all 0.14s',
+                }}
+                onMouseEnter={e => { e.currentTarget.style.background = 'var(--accent)'; e.currentTarget.style.color = '#fff'; e.currentTarget.style.borderColor = 'var(--accent)'; }}
+                onMouseLeave={e => { e.currentTarget.style.background = 'var(--bg)'; e.currentTarget.style.color = 'var(--text2)'; e.currentTarget.style.borderColor = 'var(--border2)'; }}
+                >
+                ดูรายละเอียด →
+                </button>
+            </div>
+            );
+        })}
+        </div>
     );
 }
 
-export default TaskList;
+function Pill({ children, color = 'var(--text2)', bg = 'var(--bg2)' }) {
+    return (
+        <span style={{ padding: '3px 11px', borderRadius: '99px', background: bg, color, fontSize: '12px', fontWeight: '500' }}>
+        {children}
+        </span>
+    );
+}
+
+function catIcon(cat) {
+    return { 'ทั่วไป': '📁', 'เรียน': '📚', 'ทำงาน': '💻', 'ส่วนตัว': '🏠' }[cat] || '📁';
+}

@@ -2,7 +2,7 @@ const mongoose = require('mongoose');
 
 const userSchema = new mongoose.Schema({
     username: { type: String, required: true, unique: true },
-    email: { type: String, required: true, unique: true }, // 👈 เพิ่มบรรทัดนี้เข้ามา (บังคับใส่และห้ามซ้ำ)
+    email: { type: String, required: true, unique: true }, // 👈 บังคับใส่ email
     password: { type: String, required: true },
 }, { timestamps: true });
 

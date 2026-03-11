@@ -1,47 +1,53 @@
-function Dashboard({ tasks }) {
-  // คำนวณตัวเลขสถิติต่างๆ จาก Props (tasks) ที่รับเข้ามา
-    const totalTasks = tasks.length;
-    const todoTasks = tasks.filter(task => task.status === 'To-Do').length;
-    const inProgressTasks = tasks.filter(task => task.status === 'In Progress').length;
-    const doneTasks = tasks.filter(task => task.status === 'Done').length;
+export default function Dashboard({ tasks }) {
+    const total  = tasks.length;
+    const todo   = tasks.filter(t => t.status === 'To-Do').length;
+    const inProg = tasks.filter(t => t.status === 'In Progress').length;
+    const done   = tasks.filter(t => t.status === 'Done').length;
+    const pct    = total > 0 ? Math.round((done / total) * 100) : 0;
+
+    const stats = [
+        { label: 'งานทั้งหมด',     value: total,  color: 'var(--accent)', bg: 'var(--accent-light)', border: '#1a473122' },
+        { label: 'รอดำเนินการ',    value: todo,   color: 'var(--warn)',   bg: 'var(--warn-bg)',      border: '#92400e22' },
+        { label: 'กำลังดำเนินการ', value: inProg, color: 'var(--info)',   bg: 'var(--info-bg)',      border: '#0c4a6e22' },
+        { label: 'เสร็จสิ้นแล้ว',  value: done,   color: 'var(--ok)',     bg: 'var(--ok-bg)',        border: '#14532d22' },
+    ];
 
     return (
-        <div style={{ 
-        display: 'flex', 
-        gap: '15px', 
-        marginBottom: '30px', 
-        padding: '20px', 
-        backgroundColor: '#f8f9fa', 
-        borderRadius: '10px',
-        boxShadow: '0 2px 8px rgba(0,0,0,0.05)'
+        <div style={{ marginBottom: '32px' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', gap: '14px', marginBottom: '14px' }}>
+            {stats.map(s => (
+            <div key={s.label} style={{
+                background: s.bg, border: `1px solid ${s.border}`,
+                borderRadius: 'var(--r)', padding: '20px 22px', boxShadow: 'var(--shadow-sm)',
+            }}>
+                <div style={{ fontSize: '34px', fontWeight: '700', color: s.color, fontFamily: 'Lora, serif', lineHeight: 1, marginBottom: '6px' }}>
+                {s.value}
+                </div>
+                <div style={{ fontSize: '13px', color: s.color, fontWeight: '500', opacity: 0.75 }}>{s.label}</div>
+            </div>
+            ))}
+        </div>
+
+        <div style={{
+            background: 'var(--surface)', border: '1px solid var(--border)',
+            borderRadius: 'var(--r)', padding: '16px 22px',
+            boxShadow: 'var(--shadow-sm)', display: 'flex', alignItems: 'center', gap: '18px',
         }}>
-        
-        {/* กล่องสรุป: งานทั้งหมด */}
-        <div style={{ flex: 1, padding: '15px', backgroundColor: '#fff', borderRadius: '8px', textAlign: 'center', borderLeft: '4px solid #007bff' }}>
-            <h3 style={{ margin: '0 0 10px 0', fontSize: '16px', color: '#555' }}>📋 งานทั้งหมด</h3>
-            <p style={{ fontSize: '28px', fontWeight: 'bold', margin: '0', color: '#007bff' }}>{totalTasks}</p>
+            <div style={{ flex: 1 }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px' }}>
+                <span style={{ fontSize: '13px', color: 'var(--text2)', fontWeight: '500' }}>ความคืบหน้าโดยรวม</span>
+                <span style={{ fontSize: '13px', fontWeight: '700', color: 'var(--accent)' }}>{pct}%</span>
+            </div>
+            <div style={{ height: '6px', background: 'var(--bg2)', borderRadius: '99px', overflow: 'hidden' }}>
+                <div style={{
+                height: '100%', width: `${pct}%`,
+                background: 'linear-gradient(90deg, var(--accent), #4a9b6a)',
+                borderRadius: '99px', transition: 'width 0.5s ease',
+                }} />
+            </div>
+            </div>
+            <div style={{ fontSize: '13px', color: 'var(--text3)', flexShrink: 0 }}>{done} / {total} งาน</div>
         </div>
-
-        {/* กล่องสรุป: รอดำเนินการ */}
-        <div style={{ flex: 1, padding: '15px', backgroundColor: '#fff', borderRadius: '8px', textAlign: 'center', borderLeft: '4px solid #dc3545' }}>
-            <h3 style={{ margin: '0 0 10px 0', fontSize: '16px', color: '#555' }}>⏳ รอดำเนินการ</h3>
-            <p style={{ fontSize: '28px', fontWeight: 'bold', margin: '0', color: '#dc3545' }}>{todoTasks}</p>
-        </div>
-
-        {/* กล่องสรุป: กำลังทำ */}
-        <div style={{ flex: 1, padding: '15px', backgroundColor: '#fff', borderRadius: '8px', textAlign: 'center', borderLeft: '4px solid #ffc107' }}>
-            <h3 style={{ margin: '0 0 10px 0', fontSize: '16px', color: '#555' }}>🚀 กำลังทำ</h3>
-            <p style={{ fontSize: '28px', fontWeight: 'bold', margin: '0', color: '#ffc107' }}>{inProgressTasks}</p>
-        </div>
-
-        {/* กล่องสรุป: เสร็จสิ้น */}
-        <div style={{ flex: 1, padding: '15px', backgroundColor: '#fff', borderRadius: '8px', textAlign: 'center', borderLeft: '4px solid #28a745' }}>
-            <h3 style={{ margin: '0 0 10px 0', fontSize: '16px', color: '#555' }}>✅ เสร็จสิ้น</h3>
-            <p style={{ fontSize: '28px', fontWeight: 'bold', margin: '0', color: '#28a745' }}>{doneTasks}</p>
-        </div>
-
         </div>
     );
 }
-
-export default Dashboard;
