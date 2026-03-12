@@ -1,3 +1,19 @@
+import { FiFolder, FiBook, FiMonitor, FiHome, FiClock, FiLoader, FiCheckCircle, FiAlertCircle, FiCalendar } from 'react-icons/fi';
+
+const CAT_OPTS = {
+    'ทั่วไป':  { Icon: FiFolder,  color: '#92400e' },
+    'เรียน':   { Icon: FiBook,    color: '#0c4a6e' },
+    'ทำงาน':  { Icon: FiMonitor, color: '#5b21b6' },
+    'ส่วนตัว': { Icon: FiHome,    color: '#065f46' },
+};
+
+const STATUS_MAP = {
+    'To-Do':       { Icon: FiClock,        dot: '#d97706', color: '#92400e', bg: '#fef3c7', label: 'รอดำเนินการ' },
+    'In Progress': { Icon: FiLoader,       dot: '#0284c7', color: '#0c4a6e', bg: '#e0f2fe', label: 'กำลังทำ' },
+    'Done':        { Icon: FiCheckCircle,  dot: '#16a34a', color: '#14532d', bg: '#dcfce7', label: 'เสร็จสิ้น' },
+    'เลยกำหนด':   { Icon: FiAlertCircle,  dot: '#ef4444', color: '#991b1b', bg: '#fee2e2', label: 'เลยกำหนด' },
+};
+
 export default function TaskList({ tasks, onViewDetails }) {
     if (tasks.length === 0) {
         return (
@@ -13,19 +29,13 @@ export default function TaskList({ tasks, onViewDetails }) {
         );
     }
 
-    const STATUS_MAP = {
-        'To-Do':       { dot: '#d97706', color: '#92400e', bg: '#fef3c7', label: '⏳ รอดำเนินการ' },
-        'In Progress': { dot: '#0284c7', color: '#0c4a6e', bg: '#e0f2fe', label: '🚀 กำลังทำ' },
-        'Done':        { dot: '#16a34a', color: '#14532d', bg: '#dcfce7', label: '✅ เสร็จสิ้น' },
-        'เลยกำหนด':   { dot: '#ef4444', color: '#991b1b', bg: '#fee2e2', label: '⚠️ เลยกำหนด' },
-    };
-
     return (
         <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
         {tasks.map(task => {
-            const isOverdue   = task.status === 'เลยกำหนด';
-            const isDone      = task.status === 'Done';
+            const isOverdue = task.status === 'เลยกำหนด';
+            const isDone    = task.status === 'Done';
             const s = STATUS_MAP[task.status] || STATUS_MAP['To-Do'];
+            const cat = CAT_OPTS[task.category];
 
             return (
             <div key={task.id} style={{
@@ -39,10 +49,7 @@ export default function TaskList({ tasks, onViewDetails }) {
                 onMouseLeave={e => { e.currentTarget.style.boxShadow = 'var(--shadow-sm)'; e.currentTarget.style.transform = 'translateY(0)'; }}
             >
                 {/* Color stripe */}
-                <div style={{
-                width: '4px', height: '44px', borderRadius: '99px', flexShrink: 0,
-                background: s.dot,
-                }} />
+                <div style={{ width: '4px', height: '44px', borderRadius: '99px', flexShrink: 0, background: s.dot }} />
 
                 {/* Text */}
                 <div style={{ flex: 1, minWidth: 0 }}>
@@ -55,13 +62,20 @@ export default function TaskList({ tasks, onViewDetails }) {
 
                 <div style={{ display: 'flex', gap: '7px', flexWrap: 'wrap', alignItems: 'center' }}>
                     {/* Category */}
-                    <Pill>{catIcon(task.category)} {task.category}</Pill>
+                    <Pill bg="var(--bg2)" color="var(--text2)">
+                    {cat ? <cat.Icon size={11} color={cat.color} /> : null}
+                    {task.category}
+                    </Pill>
                     {/* Status */}
-                    <Pill color={s.color} bg={s.bg}>{s.label}</Pill>
+                    <Pill bg={s.bg} color={s.color}>
+                    <s.Icon size={11} color={s.color} />
+                    {s.label}
+                    </Pill>
                     {/* Due date */}
                     {task.dueDate && (
-                    <Pill color={isOverdue ? '#991b1b' : 'var(--text3)'} bg={isOverdue ? '#fee2e2' : 'var(--bg2)'}>
-                        📅 {new Date(task.dueDate).toLocaleDateString('th-TH')}
+                    <Pill bg={isOverdue ? '#fee2e2' : 'var(--bg2)'} color={isOverdue ? '#991b1b' : 'var(--text3)'}>
+                        <FiCalendar size={11} color={isOverdue ? '#991b1b' : 'var(--text3)'} />
+                        {new Date(task.dueDate).toLocaleDateString('th-TH')}
                     </Pill>
                     )}
                 </div>
@@ -85,14 +99,14 @@ export default function TaskList({ tasks, onViewDetails }) {
     );
 }
 
-function Pill({ children, color = 'var(--text2)', bg = 'var(--bg2)' }) {
+function Pill({ children, color, bg }) {
     return (
-        <span style={{ padding: '3px 11px', borderRadius: '99px', background: bg, color, fontSize: '12px', fontWeight: '500' }}>
+        <span style={{
+        display: 'inline-flex', alignItems: 'center', gap: '5px',
+        padding: '3px 10px', borderRadius: '99px', background: bg,
+        color, fontSize: '12px', fontWeight: '500',
+        }}>
         {children}
         </span>
     );
-}
-
-function catIcon(cat) {
-    return { 'ทั่วไป': '📁', 'เรียน': '📚', 'ทำงาน': '💻', 'ส่วนตัว': '🏠' }[cat] || '📁';
 }

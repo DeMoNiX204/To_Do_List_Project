@@ -1,187 +1,192 @@
-import { useState } from 'react';
+import { useState, useRef, useEffect } from 'react';
+import { FiFolder, FiBook, FiMonitor, FiHome, FiTrash2, FiSave, FiX, FiCalendar } from 'react-icons/fi';
 
-const CATEGORIES = ['ทั่วไป', 'เรียน', 'ทำงาน', 'ส่วนตัว'];
-const CAT_ICONS = { 'ทั่วไป': '📁', 'เรียน': '📚', 'ทำงาน': '💻', 'ส่วนตัว': '🏠' };
+const CAT_OPTS = [
+    { v: 'ทั่วไป',  Icon: FiFolder,  color: '#92400e', bg: '#fef3c7' },
+    { v: 'เรียน',   Icon: FiBook,    color: '#0c4a6e', bg: '#e0f2fe' },
+    { v: 'ทำงาน',  Icon: FiMonitor, color: '#5b21b6', bg: '#ede9fe' },
+    { v: 'ส่วนตัว', Icon: FiHome,    color: '#065f46', bg: '#d1fae5' },
+];
 
-// Map สถานะภาษาอังกฤษเป็นภาษาไทยสำหรับแสดงผลปุ่ม
-const STATUS_MAP = {
-    'To-Do': 'รอดำเนินการ',
-    'In Progress': 'กำลังทำ',
-    'Done': 'เสร็จสิ้น'
-    };
+const STATUS_OPTS = [
+    { v: 'To-Do',       label: 'รอดำเนินการ', color: '#92400e', bg: '#fef3c7' },
+    { v: 'In Progress', label: 'กำลังทำ',      color: '#0c4a6e', bg: '#e0f2fe' },
+    { v: 'Done',        label: 'เสร็จสิ้น',    color: '#14532d', bg: '#dcfce7' },
+    { v: 'เลยกำหนด',   label: 'เลยกำหนด',    color: '#991b1b', bg: '#fee2e2' },
+];
 
-    export default function TaskDetailModal({ task, onClose, onUpdateTask, onDelete }) {
-    // 1. สร้าง State สำหรับเก็บค่าต่างๆ
-    const [title, setTitle] = useState(task.title || '');
-    const [category, setCategory] = useState(task.category || 'ทั่วไป');
+export default function TaskDetailModal({ task, onClose, onUpdateTask, onDelete }) {
+    const [status, setStatus]   = useState(task.status);
     const [dueDate, setDueDate] = useState(task.dueDate || '');
-    const [description, setDescription] = useState(task.description || '');
-    const [status, setStatus] = useState(task.status || 'To-Do');
+    const [category, setCategory] = useState(task.category || 'ทั่วไป');
+    const [catOpen, setCatOpen] = useState(false);
+    const popRef = useRef(null);
+    const btnRef = useRef(null);
 
-    // 2. ฟังก์ชันบันทึก
-    const handleSave = () => {
-        onUpdateTask(task.id, { title, category, dueDate, description, status });
+    useEffect(() => {
+        const h = e => {
+        if (popRef.current && !popRef.current.contains(e.target) &&
+            btnRef.current && !btnRef.current.contains(e.target)) setCatOpen(false);
+        };
+        document.addEventListener('mousedown', h);
+        return () => document.removeEventListener('mousedown', h);
+    }, []);
+
+    const isOverdue = status === 'เลยกำหนด';
+    const selected = CAT_OPTS.find(c => c.v === category);
+
+    const handleUpdate = () => {
+        if (window.confirm('คุณแน่ใจหรือไม่ที่จะบันทึกการแก้ไข?')) {
+        onUpdateTask(task.id, { status, dueDate, category });
         onClose();
+        }
     };
 
-    // 3. ปรับสถานะที่มีให้เลือก (ลบ 'เลยกำหนด' ออกจากตัวเลือกที่กดได้)
-    const selectableStatuses = ['To-Do', 'In Progress', 'Done'];
+    const handleDelete = () => {
+        if (window.confirm('คุณแน่ใจหรือไม่ที่จะลบงานนี้? ข้อมูลจะหายไปถาวร!')) {
+        onDelete(task.id);
+        onClose();
+        }
+    };
 
     return (
         <div style={{
-        position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh',
-        background: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center',
-        zIndex: 1000, padding: '16px'
-        }}>
+        position: 'fixed', inset: 0, background: 'rgba(26,23,20,0.45)',
+        backdropFilter: 'blur(4px)', display: 'flex', alignItems: 'center',
+        justifyContent: 'center', zIndex: 9999, padding: '20px',
+        }} onClick={e => e.target === e.currentTarget && onClose()}>
         <div style={{
-            background: 'var(--surface)', padding: '24px', borderRadius: 'var(--r-lg)',
-            width: '100%', maxWidth: '500px', boxShadow: 'var(--shadow-lg)'
+            background: 'var(--surface)', borderRadius: 'var(--r-lg)',
+            padding: '32px', width: '100%', maxWidth: '520px',
+            boxShadow: 'var(--shadow-lg)', border: '1px solid var(--border)',
         }}>
-            {/* ══ HEADER ══ */}
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                <span style={{ fontSize: '14px', fontWeight: '600', color: 'var(--text2)' }}>รายละเอียดงาน</span>
-                {/* ป้ายเตือนสถานะปัจจุบัน */}
-                {task.status === 'เลยกำหนด' && (
-                <span style={{ background: 'var(--danger-bg)', color: 'var(--danger)', padding: '4px 10px', borderRadius: '99px', fontSize: '12px', fontWeight: '600' }}>
-                    ⚠️ เลยกำหนด
-                </span>
+            {/* Header */}
+            <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: '22px' }}>
+            <div style={{ flex: 1, paddingRight: '12px' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '6px' }}>
+                <p style={{ fontSize: '10px', color: 'var(--text3)', fontWeight: '600', letterSpacing: '0.8px', textTransform: 'uppercase' }}>
+                    รายละเอียดงาน
+                </p>
+                {isOverdue && (
+                    <span style={{ background: '#fee2e2', border: '1px solid #fca5a5', color: '#b91c1c', padding: '3px 10px', borderRadius: '99px', fontSize: '11px', fontWeight: '600' }}>
+                    เลยกำหนด
+                    </span>
                 )}
+                </div>
+                <h2 style={{ fontFamily: 'Lora, serif', fontSize: '22px', fontWeight: '500', color: 'var(--text)', lineHeight: 1.3 }}>
+                {task.title}
+                </h2>
             </div>
             <button onClick={onClose} style={{
-                background: 'none', border: '1px solid var(--border)', borderRadius: '50%',
-                width: '32px', height: '32px', display: 'flex', alignItems: 'center', justifyContent: 'center',
-                cursor: 'pointer', color: 'var(--text2)'
-            }}>✕</button>
+                background: 'var(--bg)', border: '1px solid var(--border)', borderRadius: '50%',
+                width: '32px', height: '32px', cursor: 'pointer', color: 'var(--text2)',
+                display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0,
+            }}><FiX size={15} /></button>
             </div>
 
-            {/* ══ TITLE ══ */}
-            <input
-            value={title}
-            onChange={e => setTitle(e.target.value)}
-            style={{
-                width: '100%', fontSize: '24px', fontWeight: '600', border: 'none',
-                outline: 'none', marginBottom: '20px', color: 'var(--text)', background: 'transparent'
-            }}
-            placeholder="ชื่องาน..."
-            />
-
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px', marginBottom: '16px' }}>
-            {/* ══ CATEGORY ══ */}
-            <div style={{ border: '1px solid var(--border)', padding: '12px', borderRadius: 'var(--r-sm)' }}>
-                <label style={{ display: 'block', fontSize: '11px', color: 'var(--text3)', marginBottom: '8px', fontWeight: '600' }}>หมวดหมู่</label>
-                <select
-                value={category}
-                onChange={e => setCategory(e.target.value)}
-                style={{ width: '100%', border: 'none', outline: 'none', fontSize: '15px', background: 'transparent', cursor: 'pointer', color: 'var(--text)' }}
-                >
-                {CATEGORIES.map(c => <option key={c} value={c}>{CAT_ICONS[c]} {c}</option>)}
-                </select>
-            </div>
-
-            {/* ══ DUE DATE (จุดแก้ที่ 3: รีเซ็ตสถานะเมื่อเลื่อนวัน) ══ */}
-            <div style={{ border: '1px solid var(--border)', padding: '12px', borderRadius: 'var(--r-sm)' }}>
-                <label style={{ display: 'block', fontSize: '11px', color: 'var(--text3)', marginBottom: '8px', fontWeight: '600' }}>วันที่ต้องเสร็จ</label>
-                <input
-                type="date"
-                value={dueDate}
-                onChange={e => {
-                    setDueDate(e.target.value);
-                    // 🌟 ดักเช็ก: ถ้าแก้โดนวันที่ และสถานะเดิมคือเลยกำหนด ให้กลับเป็นรอดำเนินการ
-                    if (status === 'เลยกำหนด') {
-                    setStatus('To-Do');
-                    }
-                }}
-                style={{ width: '100%', border: 'none', outline: 'none', fontSize: '14px', background: 'transparent', color: 'var(--text)', cursor: 'pointer' }}
-                />
-            </div>
-            </div>
-
-            {/* ══ DESCRIPTION ══ */}
-            <div style={{ border: '1px solid var(--border)', padding: '12px', borderRadius: 'var(--r-sm)', marginBottom: '20px' }}>
-            <label style={{ display: 'block', fontSize: '11px', color: 'var(--text3)', marginBottom: '8px', fontWeight: '600' }}>รายละเอียด</label>
-            <textarea
-                value={description}
-                onChange={e => setDescription(e.target.value)}
-                style={{ width: '100%', border: 'none', outline: 'none', fontSize: '14px', minHeight: '80px', resize: 'vertical', background: 'transparent', color: 'var(--text)' }}
-                placeholder="เพิ่มรายละเอียดงาน..."
-            />
-            </div>
-
-            {/* ══ STATUS BALLOONS (จุดแก้ที่ 1 และ 2: ลบเลยกำหนด และล็อกปุ่ม) ══ */}
-            <div style={{ marginBottom: '24px' }}>
-            <label style={{ display: 'block', fontSize: '11px', color: 'var(--text3)', marginBottom: '12px', fontWeight: '600' }}>อัปเดตสถานะ</label>
-            <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
-                {selectableStatuses.map(s => (
-                <button
-                    key={s}
-                    onClick={() => setStatus(s)}
-                    disabled={status === 'เลยกำหนด'} // 🌟 ล็อกปุ่มถ้าสถานะเป็นเลยกำหนด
-                    style={{
-                    flex: 1, padding: '10px', borderRadius: 'var(--r-sm)', fontSize: '13px', fontWeight: '500',
-                    border: `1px solid ${status === s ? 'var(--accent)' : 'var(--border)'}`,
-                    background: status === s ? 'var(--accent-light)' : 'transparent',
-                    color: status === s ? 'var(--accent)' : 'var(--text2)',
-                    cursor: status === 'เลยกำหนด' ? 'not-allowed' : 'pointer',
-                    opacity: status === 'เลยกำหนด' && status !== s ? 0.5 : 1 // ทำสีจางถ้าโดนล็อก
-                    }}
-                >
-                    {STATUS_MAP[s]}
-                </button>
-                ))}
-                
-                {/* โชว์ป้าย "เลยกำหนด" สีแดง (กดไม่ได้) เฉพาะตอนที่งานติดสถานะนี้อยู่ */}
-                {status === 'เลยกำหนด' && (
-                <div style={{
-                    flex: 1, padding: '10px', borderRadius: 'var(--r-sm)', fontSize: '13px', fontWeight: '500',
-                    border: '1px solid var(--danger)', background: 'var(--danger-bg)', color: 'var(--danger)',
-                    textAlign: 'center', cursor: 'not-allowed'
+            {/* Info grid */}
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px', marginBottom: '16px' }}>
+            {/* Category popover */}
+            <div style={{ background: 'var(--surface2)', border: '1px solid var(--border)', borderRadius: 'var(--r-sm)', padding: '12px 14px' }}>
+                <p style={{ fontSize: '10px', color: 'var(--text3)', fontWeight: '600', textTransform: 'uppercase', letterSpacing: '0.8px', marginBottom: '8px' }}>หมวดหมู่</p>
+                <div style={{ position: 'relative' }}>
+                <button ref={btnRef} type="button" onClick={() => setCatOpen(o => !o)} style={{
+                    display: 'flex', alignItems: 'center', gap: '7px', padding: '0',
+                    background: 'none', border: 'none', cursor: 'pointer',
+                    color: selected?.color || 'var(--text)', fontSize: '14px', fontWeight: '600',
                 }}>
-                    เลยกำหนด
-                </div>
+                    {selected && <selected.Icon size={14} color={selected.color} />}
+                    {category}
+                    <span style={{ fontSize: '9px', opacity: 0.4 }}>{catOpen ? '▲' : '▼'}</span>
+                </button>
+                {catOpen && (
+                    <div ref={popRef} style={{
+                    position: 'absolute', top: 'calc(100% + 6px)', left: 0,
+                    background: 'var(--surface)', border: '1px solid var(--border)',
+                    borderRadius: 'var(--r)', padding: '6px',
+                    boxShadow: 'var(--shadow-lg)', minWidth: '160px', zIndex: 400,
+                    animation: 'popIn 0.12s ease',
+                    }}>
+                    <style>{`@keyframes popIn{from{opacity:0;transform:translateY(-6px)}to{opacity:1;transform:translateY(0)}}`}</style>
+                    {CAT_OPTS.map(c => (
+                        <button key={c.v} type="button" onClick={() => { setCategory(c.v); setCatOpen(false); }} style={{
+                        display: 'flex', alignItems: 'center', gap: '10px',
+                        width: '100%', padding: '8px 10px', borderRadius: '8px',
+                        background: category === c.v ? c.bg : 'none', border: 'none',
+                        color: category === c.v ? c.color : 'var(--text)',
+                        fontSize: '14px', fontWeight: category === c.v ? '600' : '400',
+                        cursor: 'pointer',
+                        }}
+                        onMouseEnter={e => { if (category !== c.v) e.currentTarget.style.background = 'var(--bg2)'; }}
+                        onMouseLeave={e => { if (category !== c.v) e.currentTarget.style.background = 'none'; }}
+                        >
+                        <c.Icon size={14} color={category === c.v ? c.color : 'var(--text3)'} /> {c.v}
+                        {category === c.v && <span style={{ marginLeft: 'auto' }}>✓</span>}
+                        </button>
+                    ))}
+                    </div>
                 )}
-            </div>
-            
-            {/* 🌟 ข้อความแนะนำวิธีปลดล็อก */}
-            {status === 'เลยกำหนด' && (
-                <p style={{ fontSize: '11px', color: 'var(--danger)', marginTop: '8px' }}>
-                * งานนี้เลยกำหนดแล้ว กรุณาเลื่อน "วันที่ต้องเสร็จ"
-                </p>
-            )}
+                </div>
             </div>
 
-            {/* ══ FOOTER BUTTONS ══ */}
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '20px' }}>
-            <button
-                onClick={() => onDelete(task.id)}
-                style={{
-                padding: '10px 16px', background: 'var(--danger-bg)', color: 'var(--danger)',
-                border: '1px solid #fca5a5', borderRadius: 'var(--r-sm)', fontSize: '14px', fontWeight: '600', cursor: 'pointer'
-                }}
-            >
-                🗑️ ลบงานนี้
-            </button>
-            
-            <div style={{ display: 'flex', gap: '10px' }}>
-                <button
-                onClick={onClose}
-                style={{
-                    padding: '10px 16px', background: 'transparent', color: 'var(--text2)',
-                    border: '1px solid var(--border)', borderRadius: 'var(--r-sm)', fontSize: '14px', fontWeight: '600', cursor: 'pointer'
-                }}
-                >
-                ปิด
-                </button>
-                <button
-                onClick={handleSave}
-                style={{
-                    padding: '10px 20px', background: 'var(--accent)', color: '#fff',
-                    border: 'none', borderRadius: 'var(--r-sm)', fontSize: '14px', fontWeight: '600', cursor: 'pointer'
-                }}
-                >
-                💾 บันทึก
-                </button>
+            {/* Due date */}
+            <div style={{ background: 'var(--surface2)', border: '1px solid var(--border)', borderRadius: 'var(--r-sm)', padding: '12px 14px' }}>
+                <p style={{ fontSize: '10px', color: 'var(--text3)', fontWeight: '600', textTransform: 'uppercase', letterSpacing: '0.8px', marginBottom: '8px' }}>วันที่ต้องเสร็จ</p>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                <FiCalendar size={14} color={isOverdue ? '#dc2626' : 'var(--text3)'} />
+                <input type="date" value={dueDate} onChange={e => setDueDate(e.target.value)} style={{
+                    background: 'none', border: 'none', outline: 'none', fontSize: '14px',
+                    color: isOverdue ? '#dc2626' : 'var(--text)', fontFamily: 'Bricolage Grotesque, sans-serif',
+                    cursor: 'pointer', fontWeight: '500',
+                }} />
+                </div>
             </div>
+            </div>
+
+            {/* Description */}
+            {task.description && (
+            <div style={{
+                background: 'var(--surface2)', border: '1px solid var(--border)',
+                borderRadius: 'var(--r-sm)', padding: '14px', marginBottom: '18px',
+            }}>
+                <p style={{ fontSize: '10px', color: 'var(--text3)', fontWeight: '600', textTransform: 'uppercase', letterSpacing: '0.8px', marginBottom: '7px' }}>รายละเอียด</p>
+                <p style={{ fontSize: '14px', color: 'var(--text2)', lineHeight: '1.7', whiteSpace: 'pre-wrap' }}>{task.description}</p>
+            </div>
+            )}
+
+            {/* Status selector */}
+            <div style={{ marginBottom: '24px' }}>
+            <p style={{ fontSize: '10px', color: 'var(--text3)', fontWeight: '600', letterSpacing: '0.8px', textTransform: 'uppercase', marginBottom: '10px' }}>อัปเดตสถานะ</p>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', gap: '8px' }}>
+                {STATUS_OPTS.map(o => (
+                <button key={o.v} onClick={() => setStatus(o.v)} style={{
+                    padding: '9px 4px', borderRadius: 'var(--r-sm)', fontSize: '12px',
+                    fontWeight: status === o.v ? '600' : '400', cursor: 'pointer', transition: 'all 0.12s',
+                    background: status === o.v ? o.bg : 'var(--bg)',
+                    border: `1px solid ${status === o.v ? o.color + '55' : 'var(--border)'}`,
+                    color: status === o.v ? o.color : 'var(--text3)',
+                }}>{o.label}</button>
+                ))}
+            </div>
+            </div>
+
+            {/* Actions */}
+            <div style={{ display: 'flex', gap: '10px' }}>
+            <button onClick={handleDelete} style={{
+                display: 'flex', alignItems: 'center', gap: '6px',
+                padding: '10px 16px', background: '#fef2f2', border: '1px solid #fecaca',
+                borderRadius: 'var(--r-sm)', color: '#b91c1c', fontSize: '14px', cursor: 'pointer', fontWeight: '500',
+            }}><FiTrash2 size={14} /> ลบงานนี้</button>
+            <div style={{ flex: 1 }} />
+            <button onClick={onClose} style={{
+                padding: '10px 18px', background: 'var(--bg)', border: '1px solid var(--border2)',
+                borderRadius: 'var(--r-sm)', color: 'var(--text2)', fontSize: '14px', cursor: 'pointer',
+            }}>ปิด</button>
+            <button onClick={handleUpdate} style={{
+                display: 'flex', alignItems: 'center', gap: '6px',
+                padding: '10px 24px', background: 'var(--accent)', border: 'none',
+                borderRadius: 'var(--r-sm)', color: '#fff', fontSize: '14px', fontWeight: '600', cursor: 'pointer',
+            }}><FiSave size={14} /> บันทึก</button>
             </div>
         </div>
         </div>
