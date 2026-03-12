@@ -118,38 +118,38 @@ export default function TaskForm({ onAddTask, onClose }) {
 
                 <Field label="วันที่ต้องเสร็จ">
                 <div style={{ position: 'relative' }}>
-                    <style>{`
-                        .fb-datepicker-form .react-datepicker-wrapper { width: 100%; }
-                        .fb-datepicker-form input {
-                        width: 100%; padding: 10px 13px;
-                        background: var(--surface2); border: 1px solid var(--border);
-                        border-radius: var(--r-sm); color: var(--text);
-                        font-size: 14px; outline: none; font-family: 'Bricolage Grotesque', sans-serif;
-                        cursor: pointer;
-                        }
-                        .react-datepicker { font-family: 'Bricolage Grotesque', sans-serif !important; border: 1px solid var(--border) !important; border-radius: 12px !important; box-shadow: 0 8px 40px rgba(0,0,0,0.12) !important; overflow: hidden; }
-                        .react-datepicker__header { background: var(--accent) !important; border-bottom: none !important; border-radius: 0 !important; padding: 12px 0 8px !important; }
-                        .react-datepicker__current-month { color: #fff !important; font-weight: 600 !important; font-size: 14px !important; }
-                        .react-datepicker__day-name { color: rgba(255,255,255,0.7) !important; font-size: 11px !important; }
-                        .react-datepicker__day { border-radius: 8px !important; font-size: 13px !important; color: var(--text) !important; }
-                        .react-datepicker__day:hover { background: var(--accent-light) !important; color: var(--accent) !important; }
-                        .react-datepicker__day--selected { background: var(--accent) !important; color: #fff !important; font-weight: 600 !important; }
-                        .react-datepicker__day--today { font-weight: 700 !important; color: var(--accent) !important; }
-                        .react-datepicker__day--today.react-datepicker__day--selected { color: #fff !important; }
-                        .react-datepicker__navigation-icon::before { border-color: rgba(255,255,255,0.8) !important; }
-                        .react-datepicker__triangle { display: none !important; }
-                        .react-datepicker__today-button{background:var(--accent)!important;color:#fff!important;font-weight:600!important;font-size:13px!important;border-top:none!important;padding:8px!important;}
-                    `}</style>
-                    <div className="fb-datepicker-form">
-                        <DatePicker
-                        selected={dueDate ? new Date(dueDate) : null}
-                        onChange={date => setDueDate(date ? date.toISOString().split('T')[0] : '')}
-                        dateFormat="dd/MM/yyyy"
-                        placeholderText="เลือกวันที่..."
-                        popperPlacement="bottom-start"
-                        todayButton="วันนี้"
-                        />
-                    </div>
+                  <style>{`
+                    .fb-datepicker-form .react-datepicker-wrapper { width: 100%; }
+                    .fb-datepicker-form input {
+                      width: 100%; padding: 10px 13px;
+                      background: var(--surface2); border: 1px solid var(--border);
+                      border-radius: var(--r-sm); color: var(--text);
+                      font-size: 14px; outline: none; font-family: 'Bricolage Grotesque', sans-serif;
+                      cursor: pointer;
+                    }
+                    .react-datepicker { font-family: 'Bricolage Grotesque', sans-serif !important; border: 1px solid var(--border) !important; border-radius: 12px !important; box-shadow: 0 8px 40px rgba(0,0,0,0.12) !important; overflow: hidden; }
+                    .react-datepicker__header { background: var(--accent) !important; border-bottom: none !important; border-radius: 0 !important; padding: 12px 0 8px !important; }
+                    .react-datepicker__current-month { color: #fff !important; font-weight: 600 !important; font-size: 14px !important; }
+                    .react-datepicker__day-name { color: rgba(255,255,255,0.7) !important; font-size: 11px !important; }
+                    .react-datepicker__day { border-radius: 8px !important; font-size: 13px !important; color: var(--text) !important; }
+                    .react-datepicker__day:hover { background: var(--accent-light) !important; color: var(--accent) !important; }
+                    .react-datepicker__day--selected { background: var(--accent) !important; color: #fff !important; font-weight: 600 !important; }
+                    .react-datepicker__day--today { font-weight: 700 !important; color: var(--accent) !important; }
+                    .react-datepicker__day--today.react-datepicker__day--selected { color: #fff !important; }
+                    .react-datepicker__navigation-icon::before { border-color: rgba(255,255,255,0.8) !important; }
+                    .react-datepicker__triangle { display: none !important; }
+                    .react-datepicker__today-button{background:none!important;color:var(--accent)!important;font-weight:600!important;font-size:11px!important;border-top:1px solid var(--border)!important;padding:6px 10px!important;text-align:right!important;}
+                  `}</style>
+                  <div className="fb-datepicker-form">
+                    <DatePicker
+                      selected={dueDate ? new Date(dueDate) : null}
+                      onChange={date => setDueDate(date ? date.toISOString().split('T')[0] : '')}
+                      dateFormat="dd/MM/yyyy"
+                      placeholderText="เลือกวันที่..."
+                      popperPlacement="bottom-start"
+                      todayButton="วันนี้"
+                    />
+                  </div>
                 </div>
                 </Field>
             </div>

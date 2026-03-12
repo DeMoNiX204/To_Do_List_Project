@@ -126,7 +126,7 @@ export default function TaskDetailModal({ task, onClose, onUpdateTask, onDelete 
                 .react-datepicker__day--today.react-datepicker__day--selected{color:#fff!important}
                 .react-datepicker__navigation-icon::before{border-color:rgba(255,255,255,0.8)!important}
                 .react-datepicker__triangle{display:none!important}
-                .react-datepicker__today-button{background:var(--accent)!important;color:#fff!important;font-weight:600!important;font-size:13px!important;border-top:none!important;padding:8px!important;}
+                .react-datepicker__today-button{background:none!important;color:var(--accent)!important;font-weight:600!important;font-size:11px!important;border-top:1px solid var(--border)!important;padding:6px 10px!important;text-align:right!important;}
                 `}</style>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }} className="fb-dp">
                 <FiCalendar size={14} color={isOverdue ? '#dc2626' : 'var(--text3)'} />
