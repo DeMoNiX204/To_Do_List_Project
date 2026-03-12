@@ -45,7 +45,7 @@ export default function App() {
 
   useEffect(() => {
     if (!token) return;
-    fetch('http://localhost:5000/api/tasks', { headers: { Authorization: `Bearer ${token}` } })
+    fetch('https://to-do-list-project-c0x1.onrender.com/api/tasks', { headers: { Authorization: `Bearer ${token}` } })
       .then(r => r.json())
       .then(data => {
         if (data.message?.includes('Token')) { logout(); return; }
@@ -55,7 +55,7 @@ export default function App() {
 
   const addTask = async (d) => {
     try {
-      const res = await fetch('http://localhost:5000/api/tasks', {
+      const res = await fetch('https://to-do-list-project-c0x1.onrender.com/api/tasks', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
         body: JSON.stringify({ ...d, status: 'To-Do', tags: [] }),
@@ -67,7 +67,7 @@ export default function App() {
   };
 
   const deleteTask = async (id) => {
-    const res = await fetch(`http://localhost:5000/api/tasks/${id}`, {
+    const res = await fetch(`https://to-do-list-project-c0x1.onrender.com/api/tasks/${id}`, {
       method: 'DELETE', headers: { Authorization: `Bearer ${token}` },
     });
     if (res.ok) setTasks(p => p.filter(t => t.id !== id));
@@ -75,7 +75,7 @@ export default function App() {
 
   const updateTask = async (id, data) => {
     try {
-      const res = await fetch(`http://localhost:5000/api/tasks/${id}`, {
+      const res = await fetch(`https://to-do-list-project-c0x1.onrender.com/api/tasks/${id}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
         body: JSON.stringify(data),
