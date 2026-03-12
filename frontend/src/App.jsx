@@ -8,6 +8,13 @@ import './App.css';
 
 const CATEGORIES = ['ทั้งหมด', 'ทั่วไป', 'เรียน', 'ทำงาน', 'ส่วนตัว'];
 const CAT_ICONS  = { 'ทั้งหมด': '◈', 'ทั่วไป': '📁', 'เรียน': '📚', 'ทำงาน': '💻', 'ส่วนตัว': '🏠' };
+const STATUS_OPTS = [
+  { v: 'ทั้งหมด',     label: 'ทุกสถานะ',      icon: '◈',  color: 'var(--text2)',  bg: 'none' },
+  { v: 'To-Do',       label: 'รอดำเนินการ',   icon: '○',  color: '#92400e',       bg: '#fef3c7' },
+  { v: 'In Progress', label: 'กำลังทำ',        icon: '◉',  color: '#0c4a6e',       bg: '#e0f2fe' },
+  { v: 'Done',        label: 'เสร็จสิ้น',      icon: '●',  color: '#14532d',       bg: '#dcfce7' },
+  { v: 'เลยกำหนด',   label: 'เลยกำหนด',      icon: '▲',  color: '#991b1b',       bg: '#fee2e2' },
+];
 
 export default function App() {
   const [tasks, setTasks]               = useState([]);
@@ -22,6 +29,9 @@ export default function App() {
   const [isMobile, setIsMobile]         = useState(window.innerWidth < 640);
   const popRef = useRef(null);
   const btnRef = useRef(null);
+  const statusPopRef = useRef(null);
+  const statusBtnRef = useRef(null);
+  const [statusPopOpen, setStatusPopOpen] = useState(false);
 
   useEffect(() => {
     const fn = () => setIsMobile(window.innerWidth < 640);
@@ -33,6 +43,15 @@ export default function App() {
     const h = e => {
       if (popRef.current && !popRef.current.contains(e.target) &&
           btnRef.current && !btnRef.current.contains(e.target)) setPopOpen(false);
+    };
+    document.addEventListener('mousedown', h);
+    return () => document.removeEventListener('mousedown', h);
+  }, []);
+
+  useEffect(() => {
+    const h = e => {
+      if (statusPopRef.current && !statusPopRef.current.contains(e.target) &&
+          statusBtnRef.current && !statusBtnRef.current.contains(e.target)) setStatusPopOpen(false);
     };
     document.addEventListener('mousedown', h);
     return () => document.removeEventListener('mousedown', h);
@@ -157,7 +176,7 @@ export default function App() {
 
         {/* Page title */}
         <div style={{ marginBottom: '20px' }}>
-          <p style={{ fontSize: '11px', color: 'var(--text3)', fontWeight: '600', letterSpacing: '0.8px', textTransform: 'uppercase', marginBottom: '10px', marginTop: '0px' }}>
+          <p style={{ fontSize: '11px', color: 'var(--text3)', fontWeight: '600', letterSpacing: '0.8px', textTransform: 'uppercase', marginBottom: '8px', marginTop: '0px' }}>
             {new Date().toLocaleDateString('th-TH', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}
           </p>
           <h1 style={{
@@ -190,18 +209,20 @@ export default function App() {
                   </button>
                   {popOpen && <CategoryPopover ref={popRef} filterCat={filterCat} setFilterCat={setFilterCat} setPopOpen={setPopOpen} />}
                 </div>
-                {/* Status */}
-                <select value={filterStatus} onChange={e => setFilterStatus(e.target.value)} style={{
-                  flex: 1, padding: '10px 10px', background: 'var(--surface)',
-                  border: '1px solid var(--border2)', borderRadius: 'var(--r-sm)',
-                  color: 'var(--text2)', fontSize: '13px', outline: 'none', cursor: 'pointer',
-                }}>
-                  <option value="ทั้งหมด">📌 ทุกสถานะ</option>
-                  <option value="To-Do">⏳ รอดำเนินการ</option>
-                  <option value="In Progress">🚀 กำลังทำ</option>
-                  <option value="Done">✅ เสร็จสิ้น</option>
-                  <option value="เลยกำหนด">⚠️ เลยกำหนด</option>
-                </select>
+                {/* Status popover */}
+                <div style={{ position: 'relative', flex: 1 }}>
+                  <button ref={statusBtnRef} onClick={() => setStatusPopOpen(o => !o)} style={{
+                    width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '7px', padding: '10px 14px',
+                    background: statusPopOpen ? 'var(--accent-light)' : 'var(--surface)',
+                    border: `1px solid ${statusPopOpen ? 'var(--accent)' : 'var(--border2)'}`,
+                    borderRadius: 'var(--r-sm)', color: statusPopOpen ? 'var(--accent)' : 'var(--text2)',
+                    fontSize: '13px', fontWeight: '500', cursor: 'pointer',
+                  }}>
+                    <span>{STATUS_OPTS.find(s => s.v === filterStatus)?.icon} {STATUS_OPTS.find(s => s.v === filterStatus)?.label}</span>
+                    <span style={{ fontSize: '9px', opacity: 0.5 }}>{statusPopOpen ? '▲' : '▼'}</span>
+                  </button>
+                  {statusPopOpen && <StatusPopover ref={statusPopRef} filterStatus={filterStatus} setFilterStatus={setFilterStatus} setStatusPopOpen={setStatusPopOpen} />}
+                </div>
               </div>
               {/* Row 2: search + add */}
               <div style={{ display: 'flex', gap: '8px' }}>
@@ -241,17 +262,20 @@ export default function App() {
                 {popOpen && <CategoryPopover ref={popRef} filterCat={filterCat} setFilterCat={setFilterCat} setPopOpen={setPopOpen} />}
               </div>
 
-              <select value={filterStatus} onChange={e => setFilterStatus(e.target.value)} style={{
-                padding: '9px 14px', background: 'var(--surface)', border: '1px solid var(--border2)',
-                borderRadius: 'var(--r-sm)', color: 'var(--text2)', fontSize: '13px',
-                fontWeight: '500', outline: 'none', cursor: 'pointer', boxShadow: 'var(--shadow-sm)',
-              }}>
-                <option value="ทั้งหมด">📌 ทุกสถานะ</option>
-                <option value="To-Do">⏳ รอดำเนินการ</option>
-                <option value="In Progress">🚀 กำลังทำ</option>
-                <option value="Done">✅ เสร็จสิ้น</option>
-                <option value="เลยกำหนด">⚠️ เลยกำหนด</option>
-              </select>
+              <div style={{ position: 'relative', flexShrink: 0 }}>
+                <button ref={statusBtnRef} onClick={() => setStatusPopOpen(o => !o)} style={{
+                  display: 'flex', alignItems: 'center', gap: '7px', padding: '9px 16px',
+                  background: statusPopOpen ? 'var(--accent-light)' : 'var(--surface)',
+                  border: `1px solid ${statusPopOpen ? 'var(--accent)' : 'var(--border2)'}`,
+                  borderRadius: 'var(--r-sm)', color: statusPopOpen ? 'var(--accent)' : 'var(--text2)',
+                  fontSize: '13px', fontWeight: '500', cursor: 'pointer', boxShadow: 'var(--shadow-sm)',
+                }}>
+                  <span>{STATUS_OPTS.find(s => s.v === filterStatus)?.icon}</span>
+                  <span>{STATUS_OPTS.find(s => s.v === filterStatus)?.label}</span>
+                  <span style={{ fontSize: '9px', opacity: 0.5, marginLeft: '2px' }}>{statusPopOpen ? '▲' : '▼'}</span>
+                </button>
+                {statusPopOpen && <StatusPopover ref={statusPopRef} filterStatus={filterStatus} setFilterStatus={setFilterStatus} setStatusPopOpen={setStatusPopOpen} />}
+              </div>
 
               <div style={{
                 display: 'flex', alignItems: 'center', gap: '8px',
@@ -322,6 +346,39 @@ function CategoryPopover({ filterCat, setFilterCat, setPopOpen }, ref) {
         }}>
           <span>{{ 'ทั้งหมด': '◈', 'ทั่วไป': '📁', 'เรียน': '📚', 'ทำงาน': '💻', 'ส่วนตัว': '🏠' }[cat]}</span> {cat}
           {filterCat === cat && <span style={{ marginLeft: 'auto', fontSize: '12px' }}>✓</span>}
+        </button>
+      ))}
+    </div>
+  );
+}
+
+function StatusPopover({ filterStatus, setFilterStatus, setStatusPopOpen }, ref) {
+  return (
+    <div ref={ref} style={{
+      position: 'absolute', top: 'calc(100% + 8px)', left: 0,
+      background: 'var(--surface)', border: '1px solid var(--border)',
+      borderRadius: 'var(--r)', padding: '6px',
+      boxShadow: 'var(--shadow-lg)', minWidth: '190px', zIndex: 300,
+      animation: 'popIn 0.12s ease',
+    }}>
+      <p style={{ fontSize: '10px', color: 'var(--text3)', fontWeight: '600', letterSpacing: '0.8px', textTransform: 'uppercase', padding: '6px 10px 8px' }}>
+        สถานะ
+      </p>
+      {STATUS_OPTS.map(s => (
+        <button key={s.v} onClick={() => { setFilterStatus(s.v); setStatusPopOpen(false); }} style={{
+          display: 'flex', alignItems: 'center', gap: '10px',
+          width: '100%', padding: '8px 10px', borderRadius: '8px',
+          background: filterStatus === s.v ? (s.bg !== 'none' ? s.bg : 'var(--accent-light)') : 'none',
+          border: 'none',
+          color: filterStatus === s.v ? s.color : 'var(--text)',
+          fontSize: '14px', fontWeight: filterStatus === s.v ? '600' : '400',
+          cursor: 'pointer', textAlign: 'left',
+        }}
+          onMouseEnter={e => { if (filterStatus !== s.v) e.currentTarget.style.background = 'var(--bg2)'; }}
+          onMouseLeave={e => { if (filterStatus !== s.v) e.currentTarget.style.background = 'none'; }}
+        >
+          <span style={{ fontSize: '13px' }}>{s.icon}</span> {s.label}
+          {filterStatus === s.v && <span style={{ marginLeft: 'auto', fontSize: '12px' }}>✓</span>}
         </button>
       ))}
     </div>
