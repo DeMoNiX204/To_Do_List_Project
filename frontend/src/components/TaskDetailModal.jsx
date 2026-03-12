@@ -134,11 +134,22 @@ export default function TaskDetailModal({ task, onClose, onUpdateTask, onDelete 
                 <p style={{ fontSize: '10px', color: 'var(--text3)', fontWeight: '600', textTransform: 'uppercase', letterSpacing: '0.8px', marginBottom: '8px' }}>วันที่ต้องเสร็จ</p>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
                 <FiCalendar size={14} color={isOverdue ? '#dc2626' : 'var(--text3)'} />
-                <input type="date" value={dueDate} onChange={e => setDueDate(e.target.value)} style={{
-                    background: 'none', border: 'none', outline: 'none', fontSize: '14px',
-                    color: isOverdue ? '#dc2626' : 'var(--text)', fontFamily: 'Bricolage Grotesque, sans-serif',
-                    cursor: 'pointer', fontWeight: '500',
-                }} />
+                <input 
+                    type="date" 
+                    value={dueDate} 
+                    onChange={e => {
+                        setDueDate(e.target.value);
+                        // 🌟 LOGIC: ถ้าแก้วันที่ และสถานะเดิมคือ 'เลยกำหนด' ให้ปลดล็อกกลับเป็น 'To-Do'
+                        if (status === 'เลยกำหนด') {
+                            setStatus('To-Do');
+                        }
+                    }} 
+                    style={{
+                        background: 'none', border: 'none', outline: 'none', fontSize: '14px',
+                        color: isOverdue ? '#dc2626' : 'var(--text)', fontFamily: 'Bricolage Grotesque, sans-serif',
+                        cursor: 'pointer', fontWeight: '500',
+                    }} 
+                />
                 </div>
             </div>
             </div>
@@ -158,15 +169,34 @@ export default function TaskDetailModal({ task, onClose, onUpdateTask, onDelete 
             <div style={{ marginBottom: '24px' }}>
             <p style={{ fontSize: '10px', color: 'var(--text3)', fontWeight: '600', letterSpacing: '0.8px', textTransform: 'uppercase', marginBottom: '10px' }}>อัปเดตสถานะ</p>
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', gap: '8px' }}>
-                {STATUS_OPTS.map(o => (
-                <button key={o.v} onClick={() => setStatus(o.v)} style={{
-                    padding: '9px 4px', borderRadius: 'var(--r-sm)', fontSize: '12px',
-                    fontWeight: status === o.v ? '600' : '400', cursor: 'pointer', transition: 'all 0.12s',
-                    background: status === o.v ? o.bg : 'var(--bg)',
-                    border: `1px solid ${status === o.v ? o.color + '55' : 'var(--border)'}`,
-                    color: status === o.v ? o.color : 'var(--text3)',
-                }}>{o.label}</button>
-                ))}
+                {STATUS_OPTS.map(o => {
+                    // 🌟 LOGIC: เช็กว่าปุ่มนี้ควรจะถูกล็อกไม่ให้กดหรือไม่
+                    const isLockedByOverdue = status === 'เลยกำหนด'; // ถ้าติดสถานะเลยกำหนด ล็อกทุกปุ่ม
+                    const isOverdueBtn = o.v === 'เลยกำหนด';         // ปุ่ม "เลยกำหนด" ห้ามผู้ใช้กดเลือกเองเด็ดขาด
+                    const isDisabled = isLockedByOverdue || isOverdueBtn;
+
+                    return (
+                        <button 
+                            key={o.v} 
+                            disabled={isDisabled}
+                            onClick={() => {
+                                if (!isDisabled) setStatus(o.v);
+                            }} 
+                            style={{
+                                padding: '9px 4px', borderRadius: 'var(--r-sm)', fontSize: '12px',
+                                fontWeight: status === o.v ? '600' : '400', 
+                                cursor: isDisabled ? (status === o.v ? 'default' : 'not-allowed') : 'pointer', 
+                                transition: 'all 0.12s',
+                                background: status === o.v ? o.bg : 'var(--bg)',
+                                border: `1px solid ${status === o.v ? o.color + '55' : 'var(--border)'}`,
+                                color: status === o.v ? o.color : 'var(--text3)',
+                                opacity: isDisabled && status !== o.v ? 0.5 : 1 // ดรอปสีปุ่มที่กดไม่ได้ให้จางลงนิดนึง
+                            }}
+                        >
+                            {o.label}
+                        </button>
+                    );
+                })}
             </div>
             </div>
 
