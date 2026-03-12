@@ -5,7 +5,7 @@ const jwt = require('jsonwebtoken');
 const User = require('../models/User');
 
 // API สมัครสมาชิก
-    router.post('/register', async (req, res) => {
+router.post('/register', async (req, res) => {
     try {
         // 👈 รับ email มาจากหน้าเว็บตรงนี้
         const { username, email, password, confirmPassword } = req.body;
@@ -34,10 +34,10 @@ const User = require('../models/User');
     } catch (err) {
         res.status(500).json({ message: err.message });
     }
-    });
+});
 
     // API เข้าสู่ระบบ
-    router.post('/login', async (req, res) => {
+router.post('/login', async (req, res) => {
     try {
         const { username, password } = req.body;
 
@@ -61,6 +61,6 @@ const User = require('../models/User');
     } catch (err) {
         res.status(500).json({ message: err.message });
     }
-    });
+});
 
 module.exports = router;
