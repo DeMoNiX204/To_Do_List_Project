@@ -1,18 +1,18 @@
 import { useState, useEffect } from 'react';
-import { FiEye, FiEyeOff, FiCheckCircle } from 'react-icons/fi';
+import { FiEye, FiEyeOff, FiCheckCircle, FiAlertCircle } from 'react-icons/fi';
 
 export default function Auth({ onLoginSuccess }) {
-    const [isLogin, setIsLogin]     = useState(true);
-    const [username, setUsername]   = useState('');
-    const [email, setEmail]         = useState('');
-    const [password, setPassword]   = useState('');
-    const [confirmPw, setConfirmPw] = useState('');
-    const [error, setError]         = useState('');
-    const [loading, setLoading]     = useState(false);
-    const [isMobile, setIsMobile]   = useState(window.innerWidth < 640);
-    const [showPw, setShowPw]       = useState(false);
+    const [isLogin, setIsLogin]         = useState(true);
+    const [username, setUsername]       = useState('');
+    const [email, setEmail]             = useState('');
+    const [password, setPassword]       = useState('');
+    const [confirmPw, setConfirmPw]     = useState('');
+    const [loading, setLoading]         = useState(false);
+    const [isMobile, setIsMobile]       = useState(window.innerWidth < 640);
+    const [showPw, setShowPw]           = useState(false);
     const [showConfirm, setShowConfirm] = useState(false);
-    const [toast, setToast]         = useState(null); // { msg, type }
+    const [toast, setToast]             = useState(null);
+    const [fieldErrors, setFieldErrors] = useState({});
 
     useEffect(() => {
         const fn = () => setIsMobile(window.innerWidth < 640);
@@ -20,20 +20,39 @@ export default function Auth({ onLoginSuccess }) {
         return () => window.removeEventListener('resize', fn);
     }, []);
 
-    const showToast = (msg, type = 'success') => {
-        setToast({ msg, type });
+    const showToast = (msg) => {
+        setToast(msg);
         setTimeout(() => setToast(null), 3000);
     };
 
+    const validateEmail = v => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v);
+
+    const validate = () => {
+        const errs = {};
+        if (!username.trim()) errs.username = 'กรุณาระบุชื่อผู้ใช้';
+        if (!isLogin) {
+        if (!email.trim()) errs.email = 'กรุณาระบุอีเมล';
+        else if (!validateEmail(email)) errs.email = 'รูปแบบอีเมลไม่ถูกต้อง';
+        }
+        if (!password) errs.password = 'กรุณาระบุรหัสผ่าน';
+        else if (!isLogin && password.length < 6) errs.password = 'รหัสผ่านต้องมีอย่างน้อย 6 ตัวอักษร';
+        if (!isLogin && password !== confirmPw) errs.confirmPw = 'รหัสผ่านไม่ตรงกัน';
+        return errs;
+    };
+
     const submit = async e => {
-        e.preventDefault(); setError('');
-        if (!isLogin && password !== confirmPw) return setError('รหัสผ่านไม่ตรงกัน');
+        e.preventDefault();
+        const errs = validate();
+        setFieldErrors(errs);
+        if (Object.keys(errs).length > 0) return;
         setLoading(true);
         try {
         const res = await fetch(`https://to-do-list-project-c0x1.onrender.com/api/auth/${isLogin ? 'login' : 'register'}`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(isLogin ? { username, password } : { username, email, password, confirmPassword: confirmPw }),
+            body: JSON.stringify(isLogin
+            ? { username, password }
+            : { username, email, password, confirmPassword: confirmPw }),
         });
         const data = await res.json();
         if (!res.ok) throw new Error(data.message || 'เกิดข้อผิดพลาด');
@@ -45,21 +64,38 @@ export default function Auth({ onLoginSuccess }) {
             showToast('สมัครสำเร็จ! กรุณาเข้าสู่ระบบ');
             setIsLogin(true); setPassword(''); setConfirmPw('');
         }
-        } catch (err) { setError(err.message); }
-        finally { setLoading(false); }
+        } catch (err) {
+        setFieldErrors({ server: err.message });
+        } finally {
+        setLoading(false);
+        }
     };
 
-    const fields = [
-        { label: 'ชื่อผู้ใช้', type: 'text',     val: username,  set: setUsername,  ph: 'username',        show: true,      isPw: false },
-        { label: 'อีเมล',      type: 'email',    val: email,     set: setEmail,     ph: 'you@example.com', show: !isLogin,  isPw: false },
-        { label: 'รหัสผ่าน',   type: 'password', val: password,  set: setPassword,  ph: '••••••••',         show: true,      isPw: true,  showState: showPw,      toggleShow: () => setShowPw(v => !v) },
-        { label: 'ยืนยันรหัส', type: 'password', val: confirmPw, set: setConfirmPw, ph: '••••••••',         show: !isLogin,  isPw: true,  showState: showConfirm, toggleShow: () => setShowConfirm(v => !v) },
-    ].filter(f => f.show);
+    const clearErr = key => setFieldErrors(p => ({ ...p, [key]: '' }));
+
+    const inputStyle = (key) => ({
+        width: '100%', padding: '12px 14px',
+        background: 'var(--surface)',
+        border: `1px solid ${fieldErrors[key] ? '#fca5a5' : 'var(--border)'}`,
+        borderRadius: 'var(--r-sm)', color: 'var(--text)',
+        fontSize: '15px', outline: 'none',
+        boxSizing: 'border-box',
+    });
+
+    const pwInputStyle = (key) => ({
+        ...inputStyle(key), paddingRight: '44px',
+    });
+
+    const FieldError = ({ k }) => fieldErrors[k] ? (
+        <p style={{ margin: '5px 0 0', fontSize: '12px', color: '#dc2626', display: 'flex', alignItems: 'center', gap: '4px' }}>
+        <FiAlertCircle size={12} /> {fieldErrors[k]}
+        </p>
+    ) : null;
 
     return (
         <div style={{ minHeight: '100vh', display: 'flex', flexDirection: isMobile ? 'column' : 'row', background: 'var(--bg)', position: 'relative' }}>
 
-        {/* ── Toast ── */}
+        {/* Toast */}
         {toast && (
             <div style={{
             position: 'fixed', top: '24px', left: '50%', transform: 'translateX(-50%)',
@@ -67,23 +103,20 @@ export default function Auth({ onLoginSuccess }) {
             background: 'var(--surface)', border: '1px solid var(--border)',
             borderRadius: 'var(--r)', padding: '14px 20px',
             boxShadow: 'var(--shadow-lg)', fontSize: '14px', fontWeight: '500',
-            color: 'var(--text)', animation: 'slideDown 0.2s ease',
-            whiteSpace: 'nowrap',
+            color: 'var(--text)', animation: 'slideDown 0.2s ease', whiteSpace: 'nowrap',
             }}>
             <style>{`@keyframes slideDown { from{opacity:0;transform:translateX(-50%) translateY(-10px)} to{opacity:1;transform:translateX(-50%) translateY(0)} }`}</style>
-            <div style={{ width: '28px', height: '28px', borderRadius: '50%', background: 'var(--ok-bg)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+            <div style={{ width: '28px', height: '28px', borderRadius: '50%', background: 'var(--ok-bg)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                 <FiCheckCircle size={15} color="var(--ok)" />
             </div>
-            {toast.msg}
+            {toast}
             </div>
         )}
 
-        {/* ── Left / Top panel ── */}
+        {/* Left panel */}
         <div style={{
-            width: isMobile ? '100%' : '42%',
-            minHeight: isMobile ? '180px' : 'auto',
-            background: 'var(--accent)',
-            display: 'flex', flexDirection: 'column',
+            width: isMobile ? '100%' : '42%', minHeight: isMobile ? '180px' : 'auto',
+            background: 'var(--accent)', display: 'flex', flexDirection: 'column',
             justifyContent: isMobile ? 'center' : 'flex-end',
             padding: isMobile ? '32px 28px' : '60px',
             position: 'relative', overflow: 'hidden',
@@ -110,7 +143,7 @@ export default function Auth({ onLoginSuccess }) {
             </div>
         </div>
 
-        {/* ── Right / Bottom panel ── */}
+        {/* Right panel */}
         <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: isMobile ? '32px 24px 48px' : '40px' }}>
             <div style={{ width: '100%', maxWidth: '380px' }}>
             <h1 style={{ fontFamily: 'Lora, serif', fontSize: isMobile ? '26px' : '30px', fontWeight: '400', color: 'var(--text)', marginBottom: '6px' }}>
@@ -120,39 +153,64 @@ export default function Auth({ onLoginSuccess }) {
                 {isLogin ? 'กรอกข้อมูลเพื่อเข้าสู่ระบบ' : 'เริ่มต้นฟรี ไม่มีค่าใช้จ่าย'}
             </p>
 
-            {error && (
-                <div style={{ background: '#fef2f2', border: '1px solid #fecaca', color: '#b91c1c', padding: '12px 16px', borderRadius: 'var(--r-sm)', fontSize: '13px', marginBottom: '16px' }}>
-                ⚠ {error}
+            {fieldErrors.server && (
+                <div style={{ background: '#fef2f2', border: '1px solid #fecaca', color: '#b91c1c', padding: '12px 16px', borderRadius: 'var(--r-sm)', fontSize: '13px', marginBottom: '16px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <FiAlertCircle size={14} /> {fieldErrors.server}
                 </div>
             )}
 
-            <form onSubmit={submit} style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
-                {fields.map(f => (
-                <div key={f.label}>
-                    <label style={{ display: 'block', color: 'var(--text2)', fontSize: '13px', fontWeight: '500', marginBottom: '6px' }}>{f.label}</label>
-                    {f.isPw ? (
-                    <div style={{ position: 'relative' }}>
-                        <input
-                        type={f.showState ? 'text' : 'password'}
-                        placeholder={f.ph} value={f.val}
-                        onChange={e => f.set(e.target.value)} required
-                        style={{ width: '100%', padding: '12px 44px 12px 14px', background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: 'var(--r-sm)', color: 'var(--text)', fontSize: '15px', outline: 'none' }}
-                        />
-                        <button type="button" onClick={f.toggleShow} style={{
-                        position: 'absolute', right: '12px', top: '50%', transform: 'translateY(-50%)',
-                        background: 'none', border: 'none', cursor: 'pointer', color: 'var(--text3)',
-                        display: 'flex', alignItems: 'center', padding: '4px',
-                        }}>
-                        {f.showState ? <FiEyeOff size={16} /> : <FiEye size={16} />}
-                        </button>
-                    </div>
-                    ) : (
-                    <input type={f.type} placeholder={f.ph} value={f.val}
-                        onChange={e => f.set(e.target.value)} required
-                        style={{ width: '100%', padding: '12px 14px', background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: 'var(--r-sm)', color: 'var(--text)', fontSize: '15px', outline: 'none' }} />
-                    )}
+            <form onSubmit={submit} noValidate style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
+
+                {/* ชื่อผู้ใช้ */}
+                <div>
+                <label style={{ display: 'block', color: 'var(--text2)', fontSize: '13px', fontWeight: '500', marginBottom: '6px' }}>ชื่อผู้ใช้</label>
+                <input type="text" placeholder="username" value={username}
+                    onChange={e => { setUsername(e.target.value); clearErr('username'); }}
+                    style={inputStyle('username')} />
+                <FieldError k="username" />
                 </div>
-                ))}
+
+                {/* อีเมล (register only) */}
+                {!isLogin && (
+                <div>
+                    <label style={{ display: 'block', color: 'var(--text2)', fontSize: '13px', fontWeight: '500', marginBottom: '6px' }}>อีเมล</label>
+                    <input type="email" placeholder="you@example.com" value={email}
+                    onChange={e => { setEmail(e.target.value); clearErr('email'); }}
+                    style={inputStyle('email')} />
+                    <FieldError k="email" />
+                </div>
+                )}
+
+                {/* รหัสผ่าน */}
+                <div>
+                <label style={{ display: 'block', color: 'var(--text2)', fontSize: '13px', fontWeight: '500', marginBottom: '6px' }}>รหัสผ่าน</label>
+                <div style={{ position: 'relative' }}>
+                    <input type={showPw ? 'text' : 'password'} placeholder="••••••••" value={password}
+                    onChange={e => { setPassword(e.target.value); clearErr('password'); }}
+                    style={pwInputStyle('password')} />
+                    <button type="button" onClick={() => setShowPw(v => !v)} style={{ position: 'absolute', right: '12px', top: '50%', transform: 'translateY(-50%)', background: 'none', border: 'none', cursor: 'pointer', color: 'var(--text3)', display: 'flex', alignItems: 'center', padding: '4px' }}>
+                    {showPw ? <FiEyeOff size={16} /> : <FiEye size={16} />}
+                    </button>
+                </div>
+                <FieldError k="password" />
+                </div>
+
+                {/* ยืนยันรหัส (register only) */}
+                {!isLogin && (
+                <div>
+                    <label style={{ display: 'block', color: 'var(--text2)', fontSize: '13px', fontWeight: '500', marginBottom: '6px' }}>ยืนยันรหัส</label>
+                    <div style={{ position: 'relative' }}>
+                    <input type={showConfirm ? 'text' : 'password'} placeholder="••••••••" value={confirmPw}
+                        onChange={e => { setConfirmPw(e.target.value); clearErr('confirmPw'); }}
+                        style={pwInputStyle('confirmPw')} />
+                    <button type="button" onClick={() => setShowConfirm(v => !v)} style={{ position: 'absolute', right: '12px', top: '50%', transform: 'translateY(-50%)', background: 'none', border: 'none', cursor: 'pointer', color: 'var(--text3)', display: 'flex', alignItems: 'center', padding: '4px' }}>
+                        {showConfirm ? <FiEyeOff size={16} /> : <FiEye size={16} />}
+                    </button>
+                    </div>
+                    <FieldError k="confirmPw" />
+                </div>
+                )}
+
                 <button type="submit" disabled={loading} style={{
                 marginTop: '4px', padding: '14px',
                 background: loading ? 'var(--border2)' : 'var(--accent)',
@@ -165,7 +223,7 @@ export default function Auth({ onLoginSuccess }) {
 
             <p style={{ textAlign: 'center', marginTop: '20px', fontSize: '14px', color: 'var(--text3)' }}>
                 {isLogin ? 'ยังไม่มีบัญชี? ' : 'มีบัญชีอยู่แล้ว? '}
-                <button onClick={() => { setIsLogin(!isLogin); setError(''); setShowPw(false); setShowConfirm(false); }} style={{
+                <button onClick={() => { setIsLogin(!isLogin); setFieldErrors({}); setShowPw(false); setShowConfirm(false); }} style={{
                 background: 'none', border: 'none', color: 'var(--accent)', cursor: 'pointer',
                 fontWeight: '600', fontSize: '14px', textDecoration: 'underline', textUnderlineOffset: '3px',
                 }}>
