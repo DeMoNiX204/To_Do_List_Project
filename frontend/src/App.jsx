@@ -136,6 +136,25 @@ export default function App() {
   return (
     <div style={{ background: 'var(--bg)', minHeight: '100vh' }}>
 
+      {/* Toast */}
+      {toast && (
+        <div style={{
+          position: 'fixed', top: '24px', left: '50%', transform: 'translateX(-50%)',
+          zIndex: 99999, display: 'flex', alignItems: 'center', gap: '10px',
+          background: 'var(--surface)', border: '1px solid var(--border)',
+          borderRadius: 'var(--r)', padding: '14px 20px',
+          boxShadow: 'var(--shadow-lg)', fontSize: '14px', fontWeight: '500',
+          color: 'var(--text)', whiteSpace: 'nowrap',
+          animation: 'toastIn 0.2s ease',
+        }}>
+          <style>{`@keyframes toastIn{from{opacity:0;transform:translateX(-50%) translateY(-10px)}to{opacity:1;transform:translateX(-50%) translateY(0)}}`}</style>
+          <div style={{ width: '28px', height: '28px', borderRadius: '50%', background: 'var(--ok-bg)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+            <FiCheckCircle size={15} color="var(--ok)" />
+          </div>
+          {toast}
+        </div>
+      )}
+
       {/* ══ NAVBAR ══ */}
       <header style={{
         position: 'sticky', top: 0, zIndex: 100,
