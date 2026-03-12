@@ -5,7 +5,6 @@ import TaskForm from './components/TaskForm';
 import TaskList from './components/TaskList';
 import TaskDetailModal from './components/TaskDetailModal';
 import Auth from './components/Auth';
-import './App.css';
 
 const CATEGORIES = ['ทั้งหมด', 'ทั่วไป', 'เรียน', 'ทำงาน', 'ส่วนตัว'];
 const CAT_OPTS = [
