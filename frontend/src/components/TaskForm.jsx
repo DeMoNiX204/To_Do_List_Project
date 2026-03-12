@@ -1,14 +1,14 @@
 import { useState, useRef, useEffect } from 'react';
-import { FiFolder, FiBook, FiMonitor, FiHome } from 'react-icons/fi';
+import { FiFolder, FiBook, FiMonitor, FiHome, FiCheck } from 'react-icons/fi';
 
 const CAT_OPTS = [
     { v: 'ทั่วไป',  Icon: FiFolder,  color: '#92400e', bg: '#fef3c7' },
     { v: 'เรียน',   Icon: FiBook,    color: '#0c4a6e', bg: '#e0f2fe' },
     { v: 'ทำงาน',  Icon: FiMonitor, color: '#5b21b6', bg: '#ede9fe' },
     { v: 'ส่วนตัว', Icon: FiHome,    color: '#065f46', bg: '#d1fae5' },
-    ];
+];
 
-    export default function TaskForm({ onAddTask, onClose }) {
+export default function TaskForm({ onAddTask, onClose }) {
     const [title, setTitle]       = useState('');
     const [category, setCategory] = useState('ทั่วไป');
     const [description, setDesc]  = useState('');
@@ -51,7 +51,7 @@ const CAT_OPTS = [
 
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '24px', borderBottom: '1px solid var(--border)', paddingBottom: '16px' }}>
             <h2 style={{ fontFamily: 'Lora, serif', fontSize: '22px', fontWeight: '500', color: 'var(--text)', margin: 0 }}>
-                ✨ เพิ่มงานใหม่
+                เพิ่มงานใหม่
             </h2>
             <button onClick={onClose} style={{
                 background: 'var(--bg)', border: '1px solid var(--border)', borderRadius: '50%',
@@ -136,7 +136,7 @@ const CAT_OPTS = [
                 borderRadius: 'var(--r-sm)', color: '#fff', fontSize: '14px',
                 fontWeight: '600', cursor: 'pointer',
                 boxShadow: '0 2px 6px rgba(26,71,49,0.25)',
-                }}>บันทึกงาน →</button>
+                }}><span style={{display:"flex",alignItems:"center",gap:"6px"}}><FiCheck size={15}/>บันทึกงาน</span></button>
             </div>
             </form>
         </div>
