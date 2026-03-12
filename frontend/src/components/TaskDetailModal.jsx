@@ -1,4 +1,6 @@
 import { useState, useRef, useEffect } from 'react';
+import DatePicker from 'react-datepicker';
+import 'react-datepicker/dist/react-datepicker.css';
 import { FiFolder, FiBook, FiMonitor, FiHome, FiTrash2, FiSave, FiX, FiCalendar } from 'react-icons/fi';
 
 const CAT_OPTS = [
@@ -132,24 +134,43 @@ export default function TaskDetailModal({ task, onClose, onUpdateTask, onDelete 
             {/* Due date */}
             <div style={{ background: 'var(--surface2)', border: '1px solid var(--border)', borderRadius: 'var(--r-sm)', padding: '12px 14px' }}>
                 <p style={{ fontSize: '10px', color: 'var(--text3)', fontWeight: '600', textTransform: 'uppercase', letterSpacing: '0.8px', marginBottom: '8px' }}>วันที่ต้องเสร็จ</p>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                <FiCalendar size={14} color={isOverdue ? '#dc2626' : 'var(--text3)'} />
-                <input 
-                    type="date" 
-                    value={dueDate} 
-                    onChange={e => {
-                        setDueDate(e.target.value);
-                        // 🌟 LOGIC: ปลดล็อกสถานะเมื่อมีการแก้วันที่
-                        if (status === 'เลยกำหนด') {
-                            setStatus('To-Do');
-                        }
-                    }} 
-                    style={{
-                        background: 'none', border: 'none', outline: 'none', fontSize: '14px',
-                        color: isOverdue ? '#dc2626' : 'var(--text)', fontFamily: 'Bricolage Grotesque, sans-serif',
-                        cursor: 'pointer', fontWeight: '500',
-                    }} 
-                />
+                <style>{`
+                  .fb-datepicker { width: 100%; }
+                  .fb-datepicker .react-datepicker-wrapper { width: 100%; }
+                  .fb-datepicker input {
+                    width: 100%; border: none; outline: none; background: none;
+                    font-family: 'Bricolage Grotesque', sans-serif;
+                    font-size: 14px; font-weight: 500; cursor: pointer;
+                    color: ${isOverdue ? '#dc2626' : 'var(--text)'};
+                  }
+                  .react-datepicker { font-family: 'Bricolage Grotesque', sans-serif !important; border: 1px solid var(--border) !important; border-radius: 12px !important; box-shadow: 0 8px 40px rgba(0,0,0,0.12) !important; overflow: hidden; }
+                  .react-datepicker__header { background: var(--accent) !important; border-bottom: none !important; border-radius: 0 !important; padding: 12px 0 8px !important; }
+                  .react-datepicker__current-month { color: #fff !important; font-weight: 600 !important; font-size: 14px !important; }
+                  .react-datepicker__day-name { color: rgba(255,255,255,0.7) !important; font-size: 11px !important; }
+                  .react-datepicker__day { border-radius: 8px !important; font-size: 13px !important; color: var(--text) !important; }
+                  .react-datepicker__day:hover { background: var(--accent-light) !important; color: var(--accent) !important; }
+                  .react-datepicker__day--selected { background: var(--accent) !important; color: #fff !important; font-weight: 600 !important; }
+                  .react-datepicker__day--today { font-weight: 700 !important; color: var(--accent) !important; }
+                  .react-datepicker__day--today.react-datepicker__day--selected { color: #fff !important; }
+                  .react-datepicker__navigation-icon::before { border-color: rgba(255,255,255,0.8) !important; }
+                  .react-datepicker__triangle { display: none !important; }
+                `}</style>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }} className="fb-datepicker">
+                  <FiCalendar size={14} color={isOverdue ? '#dc2626' : 'var(--text3)'} />
+                  <DatePicker
+                    selected={dueDate ? new Date(dueDate) : null}
+                    onChange={date => {
+                      const val = date ? date.toISOString().split('T')[0] : '';
+                      setDueDate(val);
+                      // 🌟 LOGIC: ปลดล็อกสถานะเมื่อมีการแก้วันที่
+                      if (status === 'เลยกำหนด') {
+                        setStatus('To-Do');
+                      }
+                    }}
+                    dateFormat="dd/MM/yyyy"
+                    placeholderText="เลือกวันที่..."
+                    popperPlacement="bottom-start"
+                  />
                 </div>
             </div>
             </div>
