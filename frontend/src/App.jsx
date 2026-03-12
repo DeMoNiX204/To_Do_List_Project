@@ -8,7 +8,14 @@ import Auth from './components/Auth';
 import './App.css';
 
 const CATEGORIES = ['ทั้งหมด', 'ทั่วไป', 'เรียน', 'ทำงาน', 'ส่วนตัว'];
-const CAT_ICONS  = { 'ทั้งหมด': FiLayers, 'ทั่วไป': FiFolder, 'เรียน': FiBook, 'ทำงาน': FiMonitor, 'ส่วนตัว': FiHome };
+const CAT_OPTS = [
+  { v: 'ทั้งหมด', Icon: FiLayers,  color: '#1a4731', bg: '#e6eeea' },
+  { v: 'ทั่วไป',  Icon: FiFolder,  color: '#92400e', bg: '#fef3c7' },
+  { v: 'เรียน',   Icon: FiBook,    color: '#0c4a6e', bg: '#e0f2fe' },
+  { v: 'ทำงาน',  Icon: FiMonitor, color: '#5b21b6', bg: '#ede9fe' },
+  { v: 'ส่วนตัว', Icon: FiHome,    color: '#065f46', bg: '#d1fae5' },
+];
+const CAT_ICONS = Object.fromEntries(CAT_OPTS.map(c => [c.v, c.Icon]));
 const STATUS_OPTS = [
   { v: 'ทั้งหมด',     label: 'ทุกสถานะ',      Icon: FiGrid,        color: 'var(--text2)',  bg: 'var(--bg2)' },
   { v: 'To-Do',       label: 'รอดำเนินการ',   Icon: FiClock,       color: '#92400e',       bg: '#fef3c7' },
@@ -205,7 +212,7 @@ export default function App() {
                     borderRadius: 'var(--r-sm)', color: popOpen ? 'var(--accent)' : 'var(--text2)',
                     fontSize: '13px', fontWeight: '500', cursor: 'pointer',
                   }}>
-                    <span style={{display:'flex',alignItems:'center',gap:'6px'}}>{(() => { const I = CAT_ICONS[filterCat]; return <I size={14} />; })()} {filterCat}</span>
+                    <span style={{display:'flex',alignItems:'center',gap:'6px'}}>{(() => { const c = CAT_OPTS.find(c => c.v === filterCat); return c ? <c.Icon size={14} color={popOpen ? 'var(--accent)' : c.color} /> : null; })()} {filterCat}</span>
                     <span style={{ fontSize: '9px', opacity: 0.5 }}>{popOpen ? '▲' : '▼'}</span>
                   </button>
                   {popOpen && <CategoryPopover ref={popRef} filterCat={filterCat} setFilterCat={setFilterCat} setPopOpen={setPopOpen} />}
@@ -257,7 +264,7 @@ export default function App() {
                   borderRadius: 'var(--r-sm)', color: popOpen ? 'var(--accent)' : 'var(--text2)',
                   fontSize: '13px', fontWeight: '500', cursor: 'pointer', boxShadow: 'var(--shadow-sm)',
                 }}>
-                  {(() => { const I = CAT_ICONS[filterCat]; return <I size={14} />; })()}<span>{filterCat}</span>
+                  {(() => { const c = CAT_OPTS.find(c => c.v === filterCat); return c ? <c.Icon size={14} color={popOpen ? 'var(--accent)' : c.color} /> : null; })()}<span>{filterCat}</span>
                   <span style={{ fontSize: '9px', opacity: 0.5, marginLeft: '2px' }}>{popOpen ? '▲' : '▼'}</span>
                 </button>
                 {popOpen && <CategoryPopover ref={popRef} filterCat={filterCat} setFilterCat={setFilterCat} setPopOpen={setPopOpen} />}
