@@ -133,7 +133,7 @@ export default function TaskDetailModal({ task, onClose, onUpdateTask, onDelete 
                 <DatePicker
                     selected={dueDate ? new Date(dueDate) : null}
                     onChange={date => {
-                    const val = date ? date.toISOString().split('T')[0] : '';
+                    const val = date ? `${date.getFullYear()}-${String(date.getMonth()+1).padStart(2,'0')}-${String(date.getDate()).padStart(2,'0')}` : '';
                     setDueDate(val);
                     if (status === 'เลยกำหนด') setStatus('To-Do');
                     }}
