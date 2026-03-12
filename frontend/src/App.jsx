@@ -40,6 +40,7 @@ export default function App() {
   const statusPopRef = useRef(null);
   const statusBtnRef = useRef(null);
   const [statusPopOpen, setStatusPopOpen] = useState(false);
+  const [toast, setToast] = useState(null);
 
   useEffect(() => {
     const fn = () => setIsMobile(window.innerWidth < 640);
@@ -65,6 +66,11 @@ export default function App() {
     return () => document.removeEventListener('mousedown', h);
   }, []);
 
+  const showToast = (msg) => {
+    setToast(msg);
+    setTimeout(() => setToast(null), 3000);
+  };
+
   const logout = () => {
     localStorage.removeItem('token'); localStorage.removeItem('username');
     setToken(null); setUsername(''); setTasks([]);
@@ -88,7 +94,7 @@ export default function App() {
         body: JSON.stringify({ ...d, status: 'To-Do', tags: [] }),
       });
       const saved = await res.json();
-      if (res.ok) { saved.id = saved._id; setTasks(p => [saved, ...p]); setAddOpen(false); }
+      if (res.ok) { saved.id = saved._id; setTasks(p => [saved, ...p]); setAddOpen(false); showToast('เพิ่มงานสำเร็จ!'); }
       else alert('❌ เพิ่มงานไม่สำเร็จ: ' + saved.message);
     } catch (err) { console.error(err); alert('❌ ไม่สามารถเชื่อมต่อเซิร์ฟเวอร์ได้'); }
   };
