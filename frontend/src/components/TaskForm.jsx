@@ -143,7 +143,7 @@ export default function TaskForm({ onAddTask, onClose }) {
                   <div className="fb-datepicker-form">
                     <DatePicker
                       selected={dueDate ? new Date(dueDate) : null}
-                      onChange={date => setDueDate(date ? date.toISOString().split('T')[0] : '')}
+                      onChange={date => setDueDate(date ? `${date.getFullYear()}-${String(date.getMonth()+1).padStart(2,'0')}-${String(date.getDate()).padStart(2,'0')}` : '')}
                       dateFormat="dd/MM/yyyy"
                       placeholderText="เลือกวันที่..."
                       popperPlacement="bottom-start"
