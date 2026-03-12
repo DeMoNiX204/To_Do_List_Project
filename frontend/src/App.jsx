@@ -103,7 +103,7 @@ export default function App() {
     const res = await fetch(`https://to-do-list-project-c0x1.onrender.com/api/tasks/${id}`, {
       method: 'DELETE', headers: { Authorization: `Bearer ${token}` },
     });
-    if (res.ok) setTasks(p => p.filter(t => t.id !== id));
+    if (res.ok) { setTasks(p => p.filter(t => t.id !== id)); showToast('ลบงานเรียบร้อยแล้ว'); }
   };
 
   const updateTask = async (id, data) => {
@@ -116,6 +116,7 @@ export default function App() {
       if (res.ok) {
         const u = await res.json(); u.id = u._id;
         setTasks(p => p.map(t => t.id === id ? u : t));
+        showToast('บันทึกการเปลี่ยนแปลงแล้ว');
       } else {
         const e = await res.json(); alert('❌ อัปเดตไม่สำเร็จ: ' + e.message);
       }
