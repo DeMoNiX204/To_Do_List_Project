@@ -138,6 +138,7 @@ export default function TaskForm({ onAddTask, onClose }) {
                         .react-datepicker__day--today.react-datepicker__day--selected { color: #fff !important; }
                         .react-datepicker__navigation-icon::before { border-color: rgba(255,255,255,0.8) !important; }
                         .react-datepicker__triangle { display: none !important; }
+                        .react-datepicker__today-button{background:var(--accent)!important;color:#fff!important;font-weight:600!important;font-size:13px!important;border-top:none!important;padding:8px!important;}
                     `}</style>
                     <div className="fb-datepicker-form">
                         <DatePicker
@@ -146,6 +147,7 @@ export default function TaskForm({ onAddTask, onClose }) {
                         dateFormat="dd/MM/yyyy"
                         placeholderText="เลือกวันที่..."
                         popperPlacement="bottom-start"
+                        todayButton="วันนี้"
                         />
                     </div>
                 </div>
