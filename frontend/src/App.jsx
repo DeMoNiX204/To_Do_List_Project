@@ -157,7 +157,7 @@ export default function App() {
 
         {/* Page title */}
         <div style={{ marginBottom: '20px' }}>
-          <p style={{ fontSize: '11px', color: 'var(--text3)', fontWeight: '600', letterSpacing: '0.8px', textTransform: 'uppercase', marginBottom: '8px', marginTop: '0px' }}>
+          <p style={{ fontSize: '11px', color: 'var(--text3)', fontWeight: '600', letterSpacing: '0.8px', textTransform: 'uppercase', marginBottom: '10px', marginTop: '0px' }}>
             {new Date().toLocaleDateString('th-TH', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}
           </p>
           <h1 style={{
