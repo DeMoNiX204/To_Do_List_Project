@@ -1,4 +1,4 @@
-export default function Dashboard({ tasks }) {
+export default function Dashboard({ tasks, isMobile }) {
     const total  = tasks.length;
     const todo   = tasks.filter(t => t.status === 'To-Do').length;
     const inProg = tasks.filter(t => t.status === 'In Progress').length;
@@ -13,25 +13,31 @@ export default function Dashboard({ tasks }) {
     ];
 
     return (
-        <div style={{ marginBottom: '32px' }}>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', gap: '14px', marginBottom: '14px' }}>
+        <div style={{ marginBottom: '24px' }}>
+        <div style={{
+            display: 'grid',
+            gridTemplateColumns: isMobile ? 'repeat(2,1fr)' : 'repeat(4,1fr)',
+            gap: isMobile ? '10px' : '14px',
+            marginBottom: '12px',
+        }}>
             {stats.map(s => (
             <div key={s.label} style={{
                 background: s.bg, border: `1px solid ${s.border}`,
-                borderRadius: 'var(--r)', padding: '20px 22px', boxShadow: 'var(--shadow-sm)',
+                borderRadius: 'var(--r)', padding: isMobile ? '16px' : '20px 22px',
+                boxShadow: 'var(--shadow-sm)',
             }}>
-                <div style={{ fontSize: '34px', fontWeight: '700', color: s.color, fontFamily: 'Lora, serif', lineHeight: 1, marginBottom: '6px' }}>
+                <div style={{ fontSize: isMobile ? '28px' : '34px', fontWeight: '700', color: s.color, fontFamily: 'Lora, serif', lineHeight: 1, marginBottom: '5px' }}>
                 {s.value}
                 </div>
-                <div style={{ fontSize: '13px', color: s.color, fontWeight: '500', opacity: 0.75 }}>{s.label}</div>
+                <div style={{ fontSize: '12px', color: s.color, fontWeight: '500', opacity: 0.75 }}>{s.label}</div>
             </div>
             ))}
         </div>
 
         <div style={{
             background: 'var(--surface)', border: '1px solid var(--border)',
-            borderRadius: 'var(--r)', padding: '16px 22px',
-            boxShadow: 'var(--shadow-sm)', display: 'flex', alignItems: 'center', gap: '18px',
+            borderRadius: 'var(--r)', padding: isMobile ? '14px 16px' : '16px 22px',
+            boxShadow: 'var(--shadow-sm)', display: 'flex', alignItems: 'center', gap: '16px',
         }}>
             <div style={{ flex: 1 }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px' }}>
