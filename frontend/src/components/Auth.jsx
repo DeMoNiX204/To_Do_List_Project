@@ -40,6 +40,25 @@ export default function Auth({ onLoginSuccess }) {
         return errs;
     };
 
+    const validateField = (key, val) => {
+        if (key === 'username' && !val.trim()) return 'กรุณาระบุชื่อผู้ใช้';
+        if (key === 'email') {
+        if (!val.trim()) return 'กรุณาระบุอีเมล';
+        if (!validateEmail(val)) return 'รูปแบบอีเมลไม่ถูกต้อง';
+        }
+        if (key === 'password') {
+        if (!val) return 'กรุณาระบุรหัสผ่าน';
+        if (!isLogin && val.length < 6) return 'รหัสผ่านต้องมีอย่างน้อย 6 ตัวอักษร';
+        }
+        if (key === 'confirmPw' && val !== password) return 'รหัสผ่านไม่ตรงกัน';
+        return '';
+    };
+
+    const blurErr = (key, val) => {
+        const err = validateField(key, val);
+        if (err) setFieldErrors(p => ({ ...p, [key]: err }));
+    };
+
     const submit = async e => {
         e.preventDefault();
         const errs = validate();
@@ -165,7 +184,7 @@ export default function Auth({ onLoginSuccess }) {
                 <div>
                 <label style={{ display: 'block', color: 'var(--text2)', fontSize: '13px', fontWeight: '500', marginBottom: '6px' }}>ชื่อผู้ใช้</label>
                 <input type="text" placeholder="username" value={username}
-                    onChange={e => { setUsername(e.target.value); clearErr('username'); }}
+                    onChange={e => { setUsername(e.target.value); clearErr('username'); }} onBlur={e => blurErr('username', e.target.value)}
                     style={inputStyle('username')} />
                 <FieldError k="username" />
                 </div>
@@ -175,7 +194,7 @@ export default function Auth({ onLoginSuccess }) {
                 <div>
                     <label style={{ display: 'block', color: 'var(--text2)', fontSize: '13px', fontWeight: '500', marginBottom: '6px' }}>อีเมล</label>
                     <input type="email" placeholder="you@example.com" value={email}
-                    onChange={e => { setEmail(e.target.value); clearErr('email'); }}
+                    onChange={e => { setEmail(e.target.value); clearErr('email'); }} onBlur={e => blurErr('email', e.target.value)}
                     style={inputStyle('email')} />
                     <FieldError k="email" />
                 </div>
@@ -186,7 +205,7 @@ export default function Auth({ onLoginSuccess }) {
                 <label style={{ display: 'block', color: 'var(--text2)', fontSize: '13px', fontWeight: '500', marginBottom: '6px' }}>รหัสผ่าน</label>
                 <div style={{ position: 'relative' }}>
                     <input type={showPw ? 'text' : 'password'} placeholder="••••••••" value={password}
-                    onChange={e => { setPassword(e.target.value); clearErr('password'); }}
+                    onChange={e => { setPassword(e.target.value); clearErr('password'); }} onBlur={e => blurErr('password', e.target.value)}
                     style={pwInputStyle('password')} />
                     <button type="button" onClick={() => setShowPw(v => !v)} style={{ position: 'absolute', right: '12px', top: '50%', transform: 'translateY(-50%)', background: 'none', border: 'none', cursor: 'pointer', color: 'var(--text3)', display: 'flex', alignItems: 'center', padding: '4px' }}>
                     {showPw ? <FiEyeOff size={16} /> : <FiEye size={16} />}
@@ -201,7 +220,7 @@ export default function Auth({ onLoginSuccess }) {
                     <label style={{ display: 'block', color: 'var(--text2)', fontSize: '13px', fontWeight: '500', marginBottom: '6px' }}>ยืนยันรหัส</label>
                     <div style={{ position: 'relative' }}>
                     <input type={showConfirm ? 'text' : 'password'} placeholder="••••••••" value={confirmPw}
-                        onChange={e => { setConfirmPw(e.target.value); clearErr('confirmPw'); }}
+                        onChange={e => { setConfirmPw(e.target.value); clearErr('confirmPw'); }} onBlur={e => blurErr('confirmPw', e.target.value)}
                         style={pwInputStyle('confirmPw')} />
                     <button type="button" onClick={() => setShowConfirm(v => !v)} style={{ position: 'absolute', right: '12px', top: '50%', transform: 'translateY(-50%)', background: 'none', border: 'none', cursor: 'pointer', color: 'var(--text3)', display: 'flex', alignItems: 'center', padding: '4px' }}>
                         {showConfirm ? <FiEyeOff size={16} /> : <FiEye size={16} />}
