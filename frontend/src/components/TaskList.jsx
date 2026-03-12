@@ -1,4 +1,4 @@
-import { FiFolder, FiBook, FiMonitor, FiHome, FiClock, FiLoader, FiCheckCircle, FiAlertCircle, FiCalendar } from 'react-icons/fi';
+import { FiFolder, FiBook, FiMonitor, FiHome, FiClock, FiLoader, FiCheckCircle, FiAlertCircle, FiCalendar, FiInbox } from 'react-icons/fi';
 
 const CAT_OPTS = {
     'ทั่วไป':  { Icon: FiFolder,  color: '#92400e' },
@@ -22,7 +22,9 @@ export default function TaskList({ tasks, onViewDetails }) {
             background: 'var(--surface)', border: '1px solid var(--border)',
             borderRadius: 'var(--r)', boxShadow: 'var(--shadow-sm)',
         }}>
-            <div style={{ fontSize: '32px', marginBottom: '10px' }}>🌿</div>
+            <div style={{ width: '52px', height: '52px', borderRadius: '50%', background: 'var(--bg2)', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 12px' }}>
+            <FiInbox size={24} color="var(--text3)" />
+            </div>
             <p style={{ fontSize: '15px', color: 'var(--text2)', fontWeight: '500' }}>ไม่มีงานที่ตรงกับเงื่อนไข</p>
             <p style={{ fontSize: '13px', color: 'var(--text3)', marginTop: '4px' }}>ลองเปลี่ยนตัวกรอง หรือเพิ่มงานใหม่ได้เลย</p>
         </div>
