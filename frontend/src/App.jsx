@@ -66,8 +66,8 @@ export default function App() {
     return () => document.removeEventListener('mousedown', h);
   }, []);
 
-  const showToast = (msg) => {
-    setToast(msg);
+  const showToast = (msg, type = 'success') => {
+    setToast({ msg, type });
     setTimeout(() => setToast(null), 3000);
   };
 
@@ -103,7 +103,7 @@ export default function App() {
     const res = await fetch(`https://to-do-list-project-c0x1.onrender.com/api/tasks/${id}`, {
       method: 'DELETE', headers: { Authorization: `Bearer ${token}` },
     });
-    if (res.ok) { setTasks(p => p.filter(t => t.id !== id)); showToast('ลบงานเรียบร้อยแล้ว'); }
+    if (res.ok) { setTasks(p => p.filter(t => t.id !== id)); showToast('ลบงานเรียบร้อยแล้ว', 'danger'); }
   };
 
   const updateTask = async (id, data) => {
@@ -149,10 +149,10 @@ export default function App() {
           animation: 'toastIn 0.2s ease',
         }}>
           <style>{`@keyframes toastIn{from{opacity:0;transform:translateX(-50%) translateY(-10px)}to{opacity:1;transform:translateX(-50%) translateY(0)}}`}</style>
-          <div style={{ width: '28px', height: '28px', borderRadius: '50%', background: 'var(--ok-bg)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-            <FiCheckCircle size={15} color="var(--ok)" />
+          <div style={{ width: '28px', height: '28px', borderRadius: '50%', background: toast.type === 'danger' ? 'var(--danger-bg)' : 'var(--ok-bg)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+            <FiCheckCircle size={15} color={toast.type === 'danger' ? 'var(--danger)' : 'var(--ok)'} />
           </div>
-          {toast}
+          {toast.msg}
         </div>
       )}
 
