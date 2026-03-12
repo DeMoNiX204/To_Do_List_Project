@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import { FiGrid, FiLoader, FiClock, FiCheckCircle, FiAlertCircle, FiLayers, FiFolder, FiBook, FiMonitor, FiHome } from 'react-icons/fi';
+import { FiGrid, FiLoader, FiClock, FiCheckCircle, FiAlertCircle, FiLayers, FiFolder, FiBook, FiMonitor, FiHome, FiSearch } from 'react-icons/fi';
 import Dashboard from './components/Dashboard';
 import TaskForm from './components/TaskForm';
 import TaskList from './components/TaskList';
@@ -239,7 +239,7 @@ export default function App() {
                   background: 'var(--surface)', border: '1px solid var(--border)',
                   borderRadius: 'var(--r-sm)', padding: '0 12px',
                 }}>
-                  <span style={{ color: 'var(--text3)', fontSize: '14px' }}>🔍</span>
+                  <FiSearch size={14} color='var(--text3)' />
                   <input type="text" placeholder="ค้นหาชื่องาน..." value={searchQuery}
                     onChange={e => setSearchQuery(e.target.value)}
                     style={{ border: 'none', outline: 'none', width: '100%', padding: '10px 0', background: 'transparent', color: 'var(--text)', fontSize: '13px' }} />
@@ -290,7 +290,7 @@ export default function App() {
                 background: 'var(--surface)', border: '1px solid var(--border)',
                 borderRadius: 'var(--r-sm)', padding: '0 14px', width: '240px', boxShadow: 'var(--shadow-sm)',
               }}>
-                <span style={{ color: 'var(--text3)', fontSize: '14px' }}>🔍</span>
+                <FiSearch size={14} color='var(--text3)' />
                 <input type="text" placeholder="ค้นหาชื่องาน..." value={searchQuery}
                   onChange={e => setSearchQuery(e.target.value)}
                   style={{ border: 'none', outline: 'none', width: '100%', padding: '9px 0', background: 'transparent', color: 'var(--text)', fontSize: '13px' }} />
