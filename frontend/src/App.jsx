@@ -153,11 +153,11 @@ export default function App() {
       </header>
 
       {/* ══ CONTENT ══ */}
-      <div style={{ maxWidth: '1100px', margin: '0 auto', padding: isMobile ? '24px 16px' : '40px 32px' }}>
+      <div style={{ maxWidth: '1100px', margin: '0 auto', padding: isMobile ? '16px 16px' : '28px 32px' }}>
 
         {/* Page title */}
         <div style={{ marginBottom: '20px' }}>
-          <p style={{ fontSize: '11px', color: 'var(--text3)', fontWeight: '600', letterSpacing: '0.8px', textTransform: 'uppercase', marginBottom: '4px' }}>
+          <p style={{ fontSize: '11px', color: 'var(--text3)', fontWeight: '600', letterSpacing: '0.8px', textTransform: 'uppercase', marginBottom: '2px', marginTop: '-6px' }}>
             {new Date().toLocaleDateString('th-TH', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}
           </p>
           <h1 style={{
