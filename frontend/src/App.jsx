@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
+import { FiGrid, FiLoader, FiClock, FiCheckCircle, FiAlertCircle } from 'react-icons/fi';
 import Dashboard from './components/Dashboard';
 import TaskForm from './components/TaskForm';
 import TaskList from './components/TaskList';
@@ -9,11 +10,11 @@ import './App.css';
 const CATEGORIES = ['ทั้งหมด', 'ทั่วไป', 'เรียน', 'ทำงาน', 'ส่วนตัว'];
 const CAT_ICONS  = { 'ทั้งหมด': '◈', 'ทั่วไป': '📁', 'เรียน': '📚', 'ทำงาน': '💻', 'ส่วนตัว': '🏠' };
 const STATUS_OPTS = [
-  { v: 'ทั้งหมด',     label: 'ทุกสถานะ',      icon: '◈',  color: 'var(--text2)',  bg: 'none' },
-  { v: 'To-Do',       label: 'รอดำเนินการ',   icon: '○',  color: '#92400e',       bg: '#fef3c7' },
-  { v: 'In Progress', label: 'กำลังทำ',        icon: '◉',  color: '#0c4a6e',       bg: '#e0f2fe' },
-  { v: 'Done',        label: 'เสร็จสิ้น',      icon: '●',  color: '#14532d',       bg: '#dcfce7' },
-  { v: 'เลยกำหนด',   label: 'เลยกำหนด',      icon: '▲',  color: '#991b1b',       bg: '#fee2e2' },
+  { v: 'ทั้งหมด',     label: 'ทุกสถานะ',      Icon: FiGrid,        color: 'var(--text2)',  bg: 'var(--bg2)' },
+  { v: 'To-Do',       label: 'รอดำเนินการ',   Icon: FiClock,       color: '#92400e',       bg: '#fef3c7' },
+  { v: 'In Progress', label: 'กำลังทำ',        Icon: FiLoader,      color: '#0c4a6e',       bg: '#e0f2fe' },
+  { v: 'Done',        label: 'เสร็จสิ้น',      Icon: FiCheckCircle, color: '#14532d',       bg: '#dcfce7' },
+  { v: 'เลยกำหนด',   label: 'เลยกำหนด',      Icon: FiAlertCircle, color: '#991b1b',       bg: '#fee2e2' },
 ];
 
 export default function App() {
@@ -218,7 +219,7 @@ export default function App() {
                     borderRadius: 'var(--r-sm)', color: statusPopOpen ? 'var(--accent)' : 'var(--text2)',
                     fontSize: '13px', fontWeight: '500', cursor: 'pointer',
                   }}>
-                    <span>{STATUS_OPTS.find(s => s.v === filterStatus)?.icon} {STATUS_OPTS.find(s => s.v === filterStatus)?.label}</span>
+                    <span style={{display:'flex',alignItems:'center',gap:'6px'}}>{(() => { const s = STATUS_OPTS.find(s => s.v === filterStatus); return s ? <s.Icon size={14} color={statusPopOpen ? 'var(--accent)' : s.color} /> : null; })()} {STATUS_OPTS.find(s => s.v === filterStatus)?.label}</span>
                     <span style={{ fontSize: '9px', opacity: 0.5 }}>{statusPopOpen ? '▲' : '▼'}</span>
                   </button>
                   {statusPopOpen && <StatusPopover ref={statusPopRef} filterStatus={filterStatus} setFilterStatus={setFilterStatus} setStatusPopOpen={setStatusPopOpen} />}
@@ -270,7 +271,7 @@ export default function App() {
                   borderRadius: 'var(--r-sm)', color: statusPopOpen ? 'var(--accent)' : 'var(--text2)',
                   fontSize: '13px', fontWeight: '500', cursor: 'pointer', boxShadow: 'var(--shadow-sm)',
                 }}>
-                  <span>{STATUS_OPTS.find(s => s.v === filterStatus)?.icon}</span>
+                  {(() => { const s = STATUS_OPTS.find(s => s.v === filterStatus); return s ? <s.Icon size={14} color={statusPopOpen ? 'var(--accent)' : s.color} /> : null; })()}
                   <span>{STATUS_OPTS.find(s => s.v === filterStatus)?.label}</span>
                   <span style={{ fontSize: '9px', opacity: 0.5, marginLeft: '2px' }}>{statusPopOpen ? '▲' : '▼'}</span>
                 </button>
@@ -377,7 +378,7 @@ function StatusPopover({ filterStatus, setFilterStatus, setStatusPopOpen }, ref)
           onMouseEnter={e => { if (filterStatus !== s.v) e.currentTarget.style.background = 'var(--bg2)'; }}
           onMouseLeave={e => { if (filterStatus !== s.v) e.currentTarget.style.background = 'none'; }}
         >
-          <span style={{ fontSize: '13px' }}>{s.icon}</span> {s.label}
+          <s.Icon size={14} color={filterStatus === s.v ? s.color : 'var(--text3)'} /> {s.label}
           {filterStatus === s.v && <span style={{ marginLeft: 'auto', fontSize: '12px' }}>✓</span>}
         </button>
       ))}
