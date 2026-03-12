@@ -139,7 +139,7 @@ export default function TaskDetailModal({ task, onClose, onUpdateTask, onDelete 
                     value={dueDate} 
                     onChange={e => {
                         setDueDate(e.target.value);
-                        // 🌟 LOGIC: ถ้าแก้วันที่ และสถานะเดิมคือ 'เลยกำหนด' ให้ปลดล็อกกลับเป็น 'To-Do'
+                        // 🌟 LOGIC: ปลดล็อกสถานะเมื่อมีการแก้วันที่
                         if (status === 'เลยกำหนด') {
                             setStatus('To-Do');
                         }
@@ -170,9 +170,8 @@ export default function TaskDetailModal({ task, onClose, onUpdateTask, onDelete 
             <p style={{ fontSize: '10px', color: 'var(--text3)', fontWeight: '600', letterSpacing: '0.8px', textTransform: 'uppercase', marginBottom: '10px' }}>อัปเดตสถานะ</p>
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', gap: '8px' }}>
                 {STATUS_OPTS.map(o => {
-                    // 🌟 LOGIC: เช็กว่าปุ่มนี้ควรจะถูกล็อกไม่ให้กดหรือไม่
-                    const isLockedByOverdue = status === 'เลยกำหนด'; // ถ้าติดสถานะเลยกำหนด ล็อกทุกปุ่ม
-                    const isOverdueBtn = o.v === 'เลยกำหนด';         // ปุ่ม "เลยกำหนด" ห้ามผู้ใช้กดเลือกเองเด็ดขาด
+                    const isLockedByOverdue = status === 'เลยกำหนด';
+                    const isOverdueBtn = o.v === 'เลยกำหนด';
                     const isDisabled = isLockedByOverdue || isOverdueBtn;
 
                     return (
@@ -190,7 +189,7 @@ export default function TaskDetailModal({ task, onClose, onUpdateTask, onDelete 
                                 background: status === o.v ? o.bg : 'var(--bg)',
                                 border: `1px solid ${status === o.v ? o.color + '55' : 'var(--border)'}`,
                                 color: status === o.v ? o.color : 'var(--text3)',
-                                opacity: isDisabled && status !== o.v ? 0.5 : 1 // ดรอปสีปุ่มที่กดไม่ได้ให้จางลงนิดนึง
+                                opacity: isDisabled && status !== o.v ? 0.5 : 1
                             }}
                         >
                             {o.label}
@@ -198,6 +197,14 @@ export default function TaskDetailModal({ task, onClose, onUpdateTask, onDelete 
                     );
                 })}
             </div>
+            
+            {/* 🌟 ข้อความแจ้งเตือนสีแดง (เพิ่มกลับมาให้แล้วครับ) */}
+            {isOverdue && (
+                <p style={{ fontSize: '11px', color: '#dc2626', marginTop: '10px', display: 'flex', alignItems: 'center', gap: '4px' }}>
+                    <span style={{ fontSize: '14px' }}>*</span> งานนี้เลยกำหนดแล้ว กรุณาเลื่อน "วันที่ต้องเสร็จ" เพื่อปลดล็อกสถานะ
+                </p>
+            )}
+            
             </div>
 
             {/* Actions */}
