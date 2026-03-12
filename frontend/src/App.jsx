@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import { FiGrid, FiLoader, FiClock, FiCheckCircle, FiAlertCircle } from 'react-icons/fi';
+import { FiGrid, FiLoader, FiClock, FiCheckCircle, FiAlertCircle, FiLayers, FiFolder, FiBook, FiMonitor, FiHome } from 'react-icons/fi';
 import Dashboard from './components/Dashboard';
 import TaskForm from './components/TaskForm';
 import TaskList from './components/TaskList';
@@ -8,7 +8,7 @@ import Auth from './components/Auth';
 import './App.css';
 
 const CATEGORIES = ['ทั้งหมด', 'ทั่วไป', 'เรียน', 'ทำงาน', 'ส่วนตัว'];
-const CAT_ICONS  = { 'ทั้งหมด': '◈', 'ทั่วไป': '📁', 'เรียน': '📚', 'ทำงาน': '💻', 'ส่วนตัว': '🏠' };
+const CAT_ICONS  = { 'ทั้งหมด': FiLayers, 'ทั่วไป': FiFolder, 'เรียน': FiBook, 'ทำงาน': FiMonitor, 'ส่วนตัว': FiHome };
 const STATUS_OPTS = [
   { v: 'ทั้งหมด',     label: 'ทุกสถานะ',      Icon: FiGrid,        color: 'var(--text2)',  bg: 'var(--bg2)' },
   { v: 'To-Do',       label: 'รอดำเนินการ',   Icon: FiClock,       color: '#92400e',       bg: '#fef3c7' },
@@ -205,7 +205,7 @@ export default function App() {
                     borderRadius: 'var(--r-sm)', color: popOpen ? 'var(--accent)' : 'var(--text2)',
                     fontSize: '13px', fontWeight: '500', cursor: 'pointer',
                   }}>
-                    <span>{CAT_ICONS[filterCat]} {filterCat}</span>
+                    <span style={{display:'flex',alignItems:'center',gap:'6px'}}>{(() => { const I = CAT_ICONS[filterCat]; return <I size={14} />; })()} {filterCat}</span>
                     <span style={{ fontSize: '9px', opacity: 0.5 }}>{popOpen ? '▲' : '▼'}</span>
                   </button>
                   {popOpen && <CategoryPopover ref={popRef} filterCat={filterCat} setFilterCat={setFilterCat} setPopOpen={setPopOpen} />}
@@ -257,7 +257,7 @@ export default function App() {
                   borderRadius: 'var(--r-sm)', color: popOpen ? 'var(--accent)' : 'var(--text2)',
                   fontSize: '13px', fontWeight: '500', cursor: 'pointer', boxShadow: 'var(--shadow-sm)',
                 }}>
-                  <span>{CAT_ICONS[filterCat]}</span><span>{filterCat}</span>
+                  {(() => { const I = CAT_ICONS[filterCat]; return <I size={14} />; })()}<span>{filterCat}</span>
                   <span style={{ fontSize: '9px', opacity: 0.5, marginLeft: '2px' }}>{popOpen ? '▲' : '▼'}</span>
                 </button>
                 {popOpen && <CategoryPopover ref={popRef} filterCat={filterCat} setFilterCat={setFilterCat} setPopOpen={setPopOpen} />}
@@ -345,7 +345,7 @@ function CategoryPopover({ filterCat, setFilterCat, setPopOpen }, ref) {
           fontSize: '14px', fontWeight: filterCat === cat ? '600' : '400',
           cursor: 'pointer', textAlign: 'left',
         }}>
-          <span>{{ 'ทั้งหมด': '◈', 'ทั่วไป': '📁', 'เรียน': '📚', 'ทำงาน': '💻', 'ส่วนตัว': '🏠' }[cat]}</span> {cat}
+          {(() => { const I = CAT_ICONS[cat]; return <I size={14} color={filterCat === cat ? 'var(--accent)' : 'var(--text3)'} />; })()} {cat}
           {filterCat === cat && <span style={{ marginLeft: 'auto', fontSize: '12px' }}>✓</span>}
         </button>
       ))}
