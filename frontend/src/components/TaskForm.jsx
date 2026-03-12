@@ -1,16 +1,38 @@
-import { useState } from 'react';
+import { useState, useRef, useEffect } from 'react';
+import { FiFolder, FiBook, FiMonitor, FiHome } from 'react-icons/fi';
 
-export default function TaskForm({ onAddTask, onClose }) {
+const CAT_OPTS = [
+    { v: 'ทั่วไป',  Icon: FiFolder,  color: '#92400e', bg: '#fef3c7' },
+    { v: 'เรียน',   Icon: FiBook,    color: '#0c4a6e', bg: '#e0f2fe' },
+    { v: 'ทำงาน',  Icon: FiMonitor, color: '#5b21b6', bg: '#ede9fe' },
+    { v: 'ส่วนตัว', Icon: FiHome,    color: '#065f46', bg: '#d1fae5' },
+    ];
+
+    export default function TaskForm({ onAddTask, onClose }) {
     const [title, setTitle]       = useState('');
     const [category, setCategory] = useState('ทั่วไป');
     const [description, setDesc]  = useState('');
     const [dueDate, setDueDate]   = useState('');
+    const [catOpen, setCatOpen]   = useState(false);
+    const popRef = useRef(null);
+    const btnRef = useRef(null);
+
+    useEffect(() => {
+        const h = e => {
+        if (popRef.current && !popRef.current.contains(e.target) &&
+            btnRef.current && !btnRef.current.contains(e.target)) setCatOpen(false);
+        };
+        document.addEventListener('mousedown', h);
+        return () => document.removeEventListener('mousedown', h);
+    }, []);
 
     const handleSubmit = e => {
         e.preventDefault();
         if (!title.trim()) { alert('กรุณาระบุชื่องานด้วยครับ!'); return; }
         onAddTask({ title, category, description, dueDate });
     };
+
+    const selected = CAT_OPTS.find(c => c.v === category);
 
     return (
         <div style={{
@@ -45,14 +67,53 @@ export default function TaskForm({ onAddTask, onClose }) {
             </Field>
 
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '14px' }}>
+                {/* Category custom popover */}
                 <Field label="หมวดหมู่">
-                <select value={category} onChange={e => setCategory(e.target.value)} style={inp}>
-                    <option value="ทั่วไป">📁 ทั่วไป</option>
-                    <option value="เรียน">📚 เรียน</option>
-                    <option value="ทำงาน">💻 ทำงาน</option>
-                    <option value="ส่วนตัว">🏠 ส่วนตัว</option>
-                </select>
+                <div style={{ position: 'relative' }}>
+                    <button ref={btnRef} type="button" onClick={() => setCatOpen(o => !o)} style={{
+                    ...inp, display: 'flex', alignItems: 'center', gap: '8px',
+                    cursor: 'pointer', justifyContent: 'space-between',
+                    background: catOpen ? selected?.bg : 'var(--surface2)',
+                    border: `1px solid ${catOpen ? selected?.color + '66' : 'var(--border)'}`,
+                    color: catOpen ? selected?.color : 'var(--text)',
+                    }}>
+                    <span style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                        {selected && <selected.Icon size={14} color={selected.color} />}
+                        {category}
+                    </span>
+                    <span style={{ fontSize: '9px', opacity: 0.4 }}>{catOpen ? '▲' : '▼'}</span>
+                    </button>
+
+                    {catOpen && (
+                    <div ref={popRef} style={{
+                        position: 'absolute', top: 'calc(100% + 6px)', left: 0,
+                        background: 'var(--surface)', border: '1px solid var(--border)',
+                        borderRadius: 'var(--r)', padding: '6px',
+                        boxShadow: 'var(--shadow-lg)', minWidth: '100%', zIndex: 400,
+                        animation: 'popIn 0.12s ease',
+                    }}>
+                        {CAT_OPTS.map(c => (
+                        <button key={c.v} type="button" onClick={() => { setCategory(c.v); setCatOpen(false); }} style={{
+                            display: 'flex', alignItems: 'center', gap: '10px',
+                            width: '100%', padding: '8px 10px', borderRadius: '8px',
+                            background: category === c.v ? c.bg : 'none', border: 'none',
+                            color: category === c.v ? c.color : 'var(--text)',
+                            fontSize: '14px', fontWeight: category === c.v ? '600' : '400',
+                            cursor: 'pointer', textAlign: 'left',
+                        }}
+                            onMouseEnter={e => { if (category !== c.v) e.currentTarget.style.background = 'var(--bg2)'; }}
+                            onMouseLeave={e => { if (category !== c.v) e.currentTarget.style.background = 'none'; }}
+                        >
+                            <c.Icon size={14} color={category === c.v ? c.color : 'var(--text3)'} />
+                            {c.v}
+                            {category === c.v && <span style={{ marginLeft: 'auto', fontSize: '12px' }}>✓</span>}
+                        </button>
+                        ))}
+                    </div>
+                    )}
+                </div>
                 </Field>
+
                 <Field label="วันที่ต้องเสร็จ">
                 <input type="date" value={dueDate} onChange={e => setDueDate(e.target.value)} style={inp} />
                 </Field>
